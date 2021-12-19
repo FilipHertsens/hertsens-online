@@ -12,17 +12,22 @@
 <div class="blur"></div>
 <div class="formContent blur">
     <h2>Login Form</h2>
-    <form>
-    <label>Email</label>
-    <input type="email" name="email" placeholder="Enter Email" required>
-    <label>Password</label>
-    <input type="password" name="password" placeholder="Enter Password" required>
-    <input type="submit" name="submit" value="Login">
-    <div class="remember">
-<div class="login"><div class="Oroption">OR</div></div>
-<div class="signup"> Don't have account? <a href="#">Signup Now</a> </div>
-</div>
-</form>
+    <form method="post" action="/login">
+        <label>Email</label>
+        <label style="color: red">{{error}}</label>
+        <input type="email" name="user-email" placeholder="Enter Email" required>
+        <label>Password</label>
+        <input type="password" name="user-password" placeholder="Enter Password" required>
+        <input type="submit" name="submit" value="Login">
+        <div class="remember">
+            <div class="login">
+                <div class="Oroption">OR</div>
+            </div>
+            <div class="signup"> Don't have account?
+                <a href="#">Signup Now</a>
+            </div>
+        </div>
+    </form>
 </div>
 </body>
 </html>
