@@ -17,6 +17,16 @@ def index():
     else:
         return render_template("login.html")
 
+@app.route("/users", methods=["GET"])
+def users():
+    session_token = request.cookies.get("session_token")
+
+    if session_token:
+        user = db.query(User).filter_by(session_token=session_token).first()
+        return render_template("users.html", user=user.email)
+    else:
+        return render_template("login.html")
+
 
 @app.route("/login", methods=["GET","POST"])
 def login():
