@@ -14,7 +14,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">
+    <a class="navbar-brand" href="/">
         <img src="static/img/navbarlogo.png" alt="" width="120" height="30">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,12 @@
           </ul>
         </li>
       </ul>
-        <button class="btn btn-outline-success">{{user}}</button>
+        <li class="nav-item dropdown">
+            <button class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">{{user}}</button>
+            <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            </ul>
+        </li>
     </div>
   </div>
 </nav>

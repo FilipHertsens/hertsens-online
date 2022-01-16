@@ -7,6 +7,18 @@ db = SQLAlchemy(db_url)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, unique=True)  # email must be unique! Two users cannot have the same email address
+    email = db.Column(db.String, unique=True)
     password = db.Column(db.String)
     session_token = db.Column(db.String)
+    firstname = db.Column(db.String)
+    lastname = db.Column(db.String)
+    telnr = db.Column(db.String)
+
+    def to_dict(self):
+        return{
+            'email': self.email,
+            'firstname': self.firstname,
+            'lastname': self.lastname,
+            'telnr': self.telnr,
+            'id': self.id
+        }
