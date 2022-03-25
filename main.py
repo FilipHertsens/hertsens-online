@@ -1,118 +1,119 @@
-from flask import Flask, render_template, request, redirect, url_for, make_response, jsonify
-import hashlib
-from models import User, db
-import uuid
-from werkzeug.datastructures import MultiDict
+from flask import Flask, render_template, redirect, url_for
+from flask_bootstrap import Bootstrap
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField
+from wtforms.validators import InputRequired, Email, Length
+from flask_sqlalchemy  import SQLAlchemy
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+
 
 app = Flask(__name__)
-db.create_all()  # create (new) tables in the database
+app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///test.sqlite"
+bootstrap = Bootstrap(app)
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 
-@app.route("/", methods=["GET"])
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(15), unique=True)
+    email = db.Column(db.String(50), unique=True)
+    password = db.Column(db.String(80))
+    admin = db.Column(db.Boolean, default=False)
+db.create_all()
+
+
+class MyModelView(ModelView):
+    def is_accessible(self):
+        if current_user.admin:
+            return current_user.is_authenticated
+        else:
+            return redirect(url_for('login'))
+
+    def get_edit_form(self):
+        form_class = super(ModelView, self).get_edit_form()
+        del form_class.password
+        return form_class
+
+
+admin = Admin(app)
+admin.add_view(MyModelView(User, db.session))
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+class LoginForm(FlaskForm):
+    username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
+    password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=80)])
+    remember = BooleanField('remember me')
+
+class RegisterForm(FlaskForm):
+    email = StringField('email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
+    username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
+    password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=80)])
+
+
+@app.route('/')
 def index():
-    session_token = request.cookies.get("session_token")
+    if current_user.is_authenticated:
+        print('test')
+    return render_template('index.html')
 
-    if session_token:
-        user = db.query(User).filter_by(session_token=session_token).first()
-        if user != None:
-            return render_template("index.html", user=user.firstname+' '+user.lastname)
-        else:
-            return render_template("login.html")
-    else:
-        return render_template("login.html")
-
-@app.route("/users", methods=["GET"])
-def users():
-    session_token = request.cookies.get("session_token")
-
-    if session_token:
-        user = db.query(User).filter_by(session_token=session_token).first()
-        if user != None:
-            Users = db.query(*[c for c in User.__table__.c if c.name not in ['password', 'session_token']]).all()
-            return render_template("users.html", user=user.firstname+' '+user.lastname, Users=Users)
-        else:
-            return render_template("login.html")
-    else:
-        return render_template("login.html")
-
-@app.route("/logout")
-def logout():
-    response = make_response(redirect(url_for('index')))
-    response.set_cookie("session_token", expires=0)
-    return redirect('/login')
-
-
-@app.route("/login", methods=["GET","POST"])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form.get("user-email")
-        password = request.form.get("user-password")
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        user = db.query(User).filter_by(email=email).first()
+    print(current_user)
+    form = LoginForm()
 
-        if user and hashed_password == user.password:
-            # create a random session token for this user
-            session_token = str(uuid.uuid4())
-            # save the session token in a database
-            user.session_token = session_token
-            user.save()
-            # save user's session token into a cookie
-            response = make_response(redirect(url_for('index')))
-            response.set_cookie("session_token", session_token, httponly=True, samesite='Strict', max_age=43200)
-            return response
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user:
+            if check_password_hash(user.password, form.password.data):
+                login_user(user, remember=form.remember.data)
+                return redirect(url_for('dashboard'))
 
-        error = 'Invalid Email or Password'
-        return render_template('login.html', error=error)
+        return '<h1>Invalid username or password</h1>'
+        #return '<h1>' + form.username.data + ' ' + form.password.data + '</h1>'
 
-    elif request.method == 'GET':
-        return render_template("login.html")
+    return render_template('login.html', form=form)
 
-@app.route('/getUserdata/<index>')
-def getUserdata(index):
-    session_token = request.cookies.get("session_token")
-    if session_token:
-        me = db.query(User).filter_by(session_token=session_token).first()
-        user = db.query(User).filter_by(id=index).first()
-        return jsonify(user.to_dict(),me.to_dict())
-    else:
-        return render_template("login.html")
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = RegisterForm()
 
-@app.route('/updateUser', methods=['post'])
-def updateUser():
-    email = request.form.get("email")
-    firstname = request.form.get("firstname")
-    lastname = request.form.get("lastname")
-    password = request.form.get("password")
-    telnr = request.form.get("telnr")
-    user = db.query(User).filter_by(email=email).first()
-    if user != None:
-        user.email = email
-        user.firstname = firstname
-        user.lastname = lastname
-        user.telnr = telnr
-        if password != None:
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
-            user.password = hashed_password
-        user.save()
-    else:
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        new_user = User(email=email, password=hashed_password, firstname=firstname, lastname=lastname, telnr=telnr)
-        new_user.save()
-    return redirect('/users')
+    if form.validate_on_submit():
+        hashed_password = generate_password_hash(form.password.data, method='sha256')
+        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
 
-@app.route('/resetpassword/<index>', methods=['post'])
-def resetpassword(index):
-    user = db.query(User).filter_by(id=index).first()
-    hashed_password = hashlib.sha256('password'.encode()).hexdigest()
-    user.password = hashed_password
-    user.save()
-    return redirect('/users')
+        return '<h1>New user has been created!</h1>'
+        #return '<h1>' + form.username.data + ' ' + form.email.data + ' ' + form.password.data + '</h1>'
 
-@app.route('/deleteUser/<index>')
-def deleteUser(index):
-    user = db.query(User).filter_by(id=index).first()
-    user.delete()
-    return redirect('/users')
+    return render_template('signup.html', form=form)
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html', name=current_user.username)
+
+@app.route('/check')
+@login_required
+def check():
+    return render_template('dashboard.html', name=current_user.username)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

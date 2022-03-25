@@ -1,33 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Login</title>
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="author" content="HTMLCSS3TUTORIALS" />
-<link rel="stylesheet" type="text/css" href="static/css/style.css" />
-</head>
-<body>
-<div class="blur"></div>
-<div class="formContent blur">
-    <h2>Login Form</h2>
-    <form method="post" action="/login">
-        <label>Email</label>
-        <label style="color: red">{{error}}</label>
-        <input type="email" name="user-email" placeholder="Enter Email" required>
-        <label>Password</label>
-        <input type="password" name="user-password" placeholder="Enter Password" required>
-        <input type="submit" name="submit" value="Login">
-        <div class="remember">
-            <div class="login">
-                <div class="Oroption">OR</div>
-            </div>
-            <div class="signup"> Don't have account?
-                <a href="#">Signup Now</a>
-            </div>
-        </div>
-    </form>
-</div>
-</body>
-</html>
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('.static', filename='signin.css')}}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+      <form class="form-signin" method="POST" action="/login">
+        <h2 class="form-signin-heading">Please sign in</h2>
+        {{ form.hidden_tag() }}
+        {{ wtf.form_field(form.username) }}
+        {{ wtf.form_field(form.password) }}
+        {{ wtf.form_field(form.remember) }}
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      </form>
+
+    </div> <!-- /container -->
+{% endblock %}
