@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, flash, render_template, redirect, url_for, abort
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
@@ -7,57 +7,104 @@ from flask_sqlalchemy  import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_user import roles_required, UserManager, UserMixin
+from flask_babelex import Babel
+import datetime
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///test.sqlite"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config['MAIL_SERVER'] = 'smtp.office365.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USERNAME'] = 'filip@hertsens.eu'
+app.config['MAIL_PASSWORD'] = 'GE022022!'
+app.config['MAIL_DEFAULT_SENDER'] = '"MyApp" <garage@hertsens.eu>'
+
+app.config['USER_APP_NAME'] = "Flask-User Basic App"
+app.config['USER_ENABLE_EMAIL'] = True
+app.config['USER_ENABLE_USERNAME'] = False
+app.config['USER_EMAIL_SENDER_NAME'] = "Flask-User Basic App"
+app.config['USER_EMAIL_SENDER_EMAIL'] = 'garage@hertsens.eu'
+
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+admin = Admin(app)
+babel = Babel(app)
 
+user_roles = db.Table('user_roles',
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('roles_id', db.Integer(), db.ForeignKey('roles.id'))
+    )
 
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(15), unique=True)
-    email = db.Column(db.String(50), unique=True)
+    first_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
+    last_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
+    email = db.Column(db.String(50, collation='NOCASE'), unique=True)
+    email_confirmed_at = db.Column(db.DateTime())
     password = db.Column(db.String(80))
-    admin = db.Column(db.Boolean, default=False)
+    roles = db.relationship('Role', secondary='user_roles', backref='premissions')
+
+    def __repr__(self):
+        return '{}{}'.format(self.first_name, self.last_name)
+
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+
+
+user_manager = UserManager(app, db, User)
 db.create_all()
 
 
 class MyModelView(ModelView):
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login'))
     def is_accessible(self):
-        if current_user.admin:
-            return current_user.is_authenticated
+        if current_user.is_active:
+            roless = current_user.roles
+            for x in roless:
+                if x.name == 'Admin':
+                    return current_user.is_authenticated
+                else:
+                    return abort(404)
+            return abort(404)
         else:
-            return redirect(url_for('login'))
+            return abort(404)
+    def get_edit_userForm(self):
+        form_user = ModelView(User, db.session).get_edit_form()
+        #del form_user.password
+        return form_user
 
-    def get_edit_form(self):
-        form_class = super(ModelView, self).get_edit_form()
-        del form_class.password
-        return form_class
-
-
-admin = Admin(app)
 admin.add_view(MyModelView(User, db.session))
-
+admin.add_view(MyModelView(Role, db.session))
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 class LoginForm(FlaskForm):
-    username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
+    email = StringField('email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
     password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=80)])
     remember = BooleanField('remember me')
 
 class RegisterForm(FlaskForm):
     email = StringField('email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
-    username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
+    first_name = StringField('first_name', validators=[InputRequired(), Length(min=4, max=15)])
+    last_name = StringField('last_name', validators=[InputRequired(), Length(min=4, max=15)])
     password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=80)])
 
 
@@ -69,28 +116,27 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    print(current_user)
     form = LoginForm()
-
+    error = None
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(email=form.email.data).first()
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember.data)
                 return redirect(url_for('dashboard'))
-
-        return '<h1>Invalid username or password</h1>'
-        #return '<h1>' + form.username.data + ' ' + form.password.data + '</h1>'
-
-    return render_template('login.html', form=form)
+            else:
+                error = 'Invalid password for this user'
+        else:
+            error = 'No user with this email'
+    return render_template('login.html', form=form, error=error)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = RegisterForm()
-
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='sha256')
-        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        new_user = User(first_name=form.first_name.data, last_name=form.last_name.data, email=form.email.data,
+                       password=hashed_password,email_confirmed_at=datetime.datetime.utcnow())
         db.session.add(new_user)
         db.session.commit()
 
@@ -102,12 +148,12 @@ def signup():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', name=current_user.username)
+    return render_template('dashboard.html', name=current_user.first_name)
 
-@app.route('/check')
-@login_required
-def check():
-    return render_template('dashboard.html', name=current_user.username)
+@app.route('/data')
+@roles_required('Admin')
+def an():
+    return render_template('dashboard.html', name=current_user.last_name)
 
 @app.route('/logout')
 @login_required
