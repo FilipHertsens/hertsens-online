@@ -1,4 +1,4 @@
-from flask import Flask, flash, render_template, redirect, url_for, abort
+from flask import Flask, flash, render_template, redirect, url_for, abort, request
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
@@ -12,8 +12,8 @@ from flask_user import roles_required, UserManager, UserMixin
 from flask_babelex import Babel
 import datetime
 
-
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///test.sqlite"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -64,6 +64,9 @@ class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
 
+    def __repr__(self):
+        return '{}'.format(self.name)
+
 
 user_manager = UserManager(app, db, User)
 db.create_all()
@@ -97,38 +100,37 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 class LoginForm(FlaskForm):
-    email = StringField('email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
-    password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=80)])
+    email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
     remember = BooleanField('remember me')
 
 class RegisterForm(FlaskForm):
-    email = StringField('email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
-    first_name = StringField('first_name', validators=[InputRequired(), Length(min=4, max=15)])
-    last_name = StringField('last_name', validators=[InputRequired(), Length(min=4, max=15)])
-    password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=80)])
+    email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
+    first_name = StringField('First name', validators=[InputRequired(), Length(min=4, max=15)])
+    last_name = StringField('Last name', validators=[InputRequired(), Length(min=4, max=15)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
 
 
 @app.route('/')
 def index():
-    if current_user.is_authenticated:
-        print('test')
-    return render_template('index.html')
+    form = LoginForm()
+    return render_template('index.html',user=current_user, form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     error = None
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+    if request.method == 'POST':
+        user = User.query.filter_by(email=request.form['email']).first()
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember.data)
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('index'))
             else:
                 error = 'Invalid password for this user'
         else:
-            error = 'No user with this email'
-    return render_template('login.html', form=form, error=error)
+            error = f'No user with {form.email.data} as email'
+    return render_template('login.html', form=form, error=error,user=current_user)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -143,7 +145,7 @@ def signup():
         return '<h1>New user has been created!</h1>'
         #return '<h1>' + form.username.data + ' ' + form.email.data + ' ' + form.password.data + '</h1>'
 
-    return render_template('signup.html', form=form)
+    return render_template('signup.html', form=form,user=current_user)
 
 @app.route('/dashboard')
 @login_required
@@ -154,6 +156,10 @@ def dashboard():
 @roles_required('Admin')
 def an():
     return render_template('dashboard.html', name=current_user.last_name)
+
+@app.route('/base')
+def base():
+    return render_template('base.html')
 
 @app.route('/logout')
 @login_required
