@@ -10,7 +10,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_user import roles_required, UserManager, UserMixin
 from flask_babelex import Babel
+from buttons import navbuttons
 import datetime
+
 
 app = Flask(__name__)
 
@@ -52,7 +54,7 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
     email = db.Column(db.String(50, collation='NOCASE'), unique=True)
     email_confirmed_at = db.Column(db.DateTime())
-    password = db.Column(db.String(80))
+    password = db.Column(db.String(200))
     roles = db.relationship('Role', secondary='user_roles', backref='premissions')
 
     def __repr__(self):
@@ -63,6 +65,7 @@ class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
+    list_navButtons = db.Column(db.Text)
 
     def __repr__(self):
         return '{}'.format(self.name)
@@ -89,7 +92,8 @@ class MyModelView(ModelView):
             return abort(404)
     def get_edit_userForm(self):
         form_user = ModelView(User, db.session).get_edit_form()
-        #del form_user.password
+        print(form_user)
+        del form_user.password
         return form_user
 
 admin.add_view(MyModelView(User, db.session))
@@ -114,7 +118,7 @@ class RegisterForm(FlaskForm):
 @app.route('/')
 def index():
     form = LoginForm()
-    return render_template('index.html',user=current_user, form=form)
+    return render_template('index.html',user=current_user, form=form, buttons=navbuttons())
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -130,7 +134,7 @@ def login():
                 error = 'Invalid password for this user'
         else:
             error = f'No user with {form.email.data} as email'
-    return render_template('login.html', form=form, error=error,user=current_user)
+    return render_template('login.html', form=form, error=error,user=current_user, buttons=navbuttons())
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -142,24 +146,23 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
 
-        return '<h1>New user has been created!</h1>'
-        #return '<h1>' + form.username.data + ' ' + form.email.data + ' ' + form.password.data + '</h1>'
+        return redirect(url_for('index'))
 
-    return render_template('signup.html', form=form,user=current_user)
+    return render_template('signup.html', form=form,user=current_user, buttons=navbuttons())
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', name=current_user.first_name)
+    return render_template('dashboard.html', name=current_user.first_name, buttons=navbuttons())
 
 @app.route('/data')
 @roles_required('Admin')
 def an():
-    return render_template('dashboard.html', name=current_user.last_name)
+    return render_template('dashboard.html', name=current_user.last_name, buttons=navbuttons())
 
 @app.route('/base')
 def base():
-    return render_template('base.html')
+    return render_template('base.html', buttons=navbuttons())
 
 @app.route('/logout')
 @login_required
