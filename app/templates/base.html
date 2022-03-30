@@ -14,26 +14,24 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            {% for button in buttons %}
-                {% if button.type == 'link' %}
-                    <li class="nav-item"><a class="nav-link" href={{button['href']}}>{{button['name']}}</a></li>
-                {% elif button.type == 'dropdown' %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{button.name}}
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% for subButton in button.subButtons %}
-                                {% if subButton.type == 'link' %}
-                                    <a class="dropdown-item" href={{subButton.href}}>{{subButton.name}}</a>
-                                {% elif subButton.type == 'divider' %}
-                                    <div class="dropdown-divider"></div>
-                                {% endif %}
-                            {% endfor%}
-                        </div>
-                    </li>
-                {% endif %}
-            {% endfor %}
+            {% if user.is_active %}
+                {% for buttongroup in user.get_navbarbuttons() %}
+                    {% if user.get_navbarbuttons()[buttongroup]|length > 1 %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              {{buttongroup}}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                {% for button in user.get_navbarbuttons()[buttongroup] %}
+                                    <a class="dropdown-item" href={{button['href']}}>{{button['name']}}</a>
+                                {% endfor %}
+                            </div>
+                          </li>
+                    {% else %}
+                        <a class="nav-link" href={{user.get_navbarbuttons()[buttongroup][0]['href']}}>{{user.get_navbarbuttons()[buttongroup][0]['name']}} <span class="sr-only"></span></a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </ul>
 
         {% if user.is_active %}
@@ -45,7 +43,7 @@
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                 <a class="dropdown-item" href="/">Account</a>
                 <a class="dropdown-item" href="/logout">Logout</a>
-            </div>
+
         </div>
 
         {% elif "/login" == url_for(request.endpoint) %}
