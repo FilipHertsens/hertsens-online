@@ -7,6 +7,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin.menu import MenuCategory, MenuView, MenuLink, SubMenuCategory
 from flask_login import LoginManager
 from flask_babelex import Babel
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
@@ -31,10 +32,11 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 admin = Admin(app)
+migrate = Migrate(app, db)
 
 
 babel = Babel(app)
 
-db.create_all()
+
 
 from app import views

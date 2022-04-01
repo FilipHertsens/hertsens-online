@@ -23,12 +23,12 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 {% for button in user.get_navbarbuttons()[buttongroup] %}
-                                    <a class="dropdown-item" href={{button['href']}}>{{button['name']}}</a>
+                                    <a class="dropdown-item" target={{button['new_tab']}} href={{button['href']}}>{{button['name']}}</a>
                                 {% endfor %}
                             </div>
                           </li>
                     {% else %}
-                        <a class="nav-link" href={{user.get_navbarbuttons()[buttongroup][0]['href']}}>{{user.get_navbarbuttons()[buttongroup][0]['name']}} <span class="sr-only"></span></a>
+                        <a class="nav-link" target={{user.get_navbarbuttons()[buttongroup][0]['new_tab']}} href={{user.get_navbarbuttons()[buttongroup][0]['href']}}>{{user.get_navbarbuttons()[buttongroup][0]['name']}} <span class="sr-only"></span></a>
                     {% endif %}
                 {% endfor %}
             {% endif %}

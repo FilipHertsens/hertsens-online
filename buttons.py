@@ -6,7 +6,10 @@ def navbuttons(user):
             for button in role_buttons.navbarbutton:
                 if button.navbarcat.name not in buttons:
                     buttons[button.navbarcat.name] = []
-                bn = {'name':button.name,'type':button.type,'href':button.href,}
+                new_tab = '_self'
+                if button.new_tab == True:
+                    new_tab = '_blank'
+                bn = {'name':button.name,'new_tab':new_tab,'href':button.href,}
                 buttons[button.navbarcat.name].append(bn)
 
     return buttons
