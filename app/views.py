@@ -14,6 +14,8 @@ def load_user(user_id):
 @app.route('/')
 def index():
     form = LoginForm()
+    user = User.query.filter_by(email='filip@hertsens.eu').first()
+    print(user)
     return render_template('index.html',user=current_user, form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -46,19 +48,18 @@ def signup():
 
     return render_template('signup.html', form=form,user=current_user)
 
-@app.route('/dashboard')
+
+@app.route('/checks')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', user=current_user)
+    return render_template('checks.html', user=current_user)
+
 
 @app.route('/data')
 @roles_required('Admin')
 def an():
     return render_template('dashboard.html', user=current_user)
 
-@app.route('/base')
-def base():
-    return render_template('base.html',user=current_user)
 
 @app.route('/logout')
 @login_required
