@@ -1,8 +1,8 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% extends "bootstrap/base.html" %}
-
-
 {% block navbar %}
+
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="/">
         <img src="/static/img/navbarlogo.png" width="120" height="30" alt="">
@@ -15,51 +15,90 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             {% if user.is_active %}
-                {% for buttongroup in user.get_navbarbuttons() %}
-                    {% if user.get_navbarbuttons()[buttongroup]|length > 1 %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              {{buttongroup}}
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                {% for button in user.get_navbarbuttons()[buttongroup] %}
-                                    <a class="dropdown-item" target={{button['new_tab']}} href={{button['href']}}>{{button['name']}}</a>
-                                {% endfor %}
-                            </div>
-                          </li>
-                    {% else %}
-                        <a class="nav-link" target={{user.get_navbarbuttons()[buttongroup][0]['new_tab']}} href={{user.get_navbarbuttons()[buttongroup][0]['href']}}>{{user.get_navbarbuttons()[buttongroup][0]['name']}} <span class="sr-only"></span></a>
-                    {% endif %}
-                {% endfor %}
+            {% for buttongroup in user.get_navbarbuttons() %}
+            {% if user.get_navbarbuttons()[buttongroup]|length > 1 %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    {{buttongroup}}
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {% for button in user.get_navbarbuttons()[buttongroup] %}
+                    <a class="dropdown-item" target={{button['new_tab']}} href={{button['href']}}>{{button['name']}}</a>
+                    {% endfor %}
+                </div>
+            </li>
+            {% else %}
+            <a class="nav-link" target={{user.get_navbarbuttons()[buttongroup][0]['new_tab']}}
+               href={{user.get_navbarbuttons()[buttongroup][0]['href']}}>{{user.get_navbarbuttons()[buttongroup][0]['name']}}
+                <span class="sr-only"></span></a>
+            {% endif %}
+            {% endfor %}
             {% endif %}
         </ul>
 
+
         {% if user.is_active %}
+        {% if user.current_asset != None %}
+        <div class="dropdown">
+            <a class="btn btn-outline-light my-2 my-sm-0" href="#" id="navbarDropdownMenuLink1" data-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false" style="margin-right: 5px">
+                {{user.current_asset}}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" style="right:0; left:auto">
+
+                    <h6 class="dropdown-header"> Favorieten </h6>
+                {% for favoriet in user.favoriteassets %}
+                {% set ref = "/select_asset?autocomplete=" + favoriet.id|string %}
+                    <a class="dropdown-item" href={{ref}}>{{favoriet.name}}</a>
+                {% endfor %}
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/select_asset">Asset selector</a>
+
+            </div>
+        </div>
+
+        {% else %}
+        <a class="btn btn-outline-light my-2 my-sm-0" href="/select_asset" style="margin-right: 5px">
+                Asset
+            </a>
+
+        {% endif %}
         <div class="nav-item dropdown">
             <a class="btn btn-outline-warning my-2 my-sm-0" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">
                 {{user.first_name}} {{user.last_name}}
             </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" style="right:0; left:auto">
                 <a class="dropdown-item" href="/">Account</a>
                 <a class="dropdown-item" href="/logout">Logout</a>
+            </div>
+
+
+            {% elif "/login" == url_for(request.endpoint) %}
+            {% else %}
+            <form class="form-inline my-2 my-lg-0" method="POST" action="/login">
+                {{ form.email(class='form-control', placeholder='email', style='margin-right:5px') }}
+                {{ form.password(class='form-control', placeholder='password', style='margin-right:5px') }}
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="margin-right:5px">Login
+                </button>
+                <a class="btn btn-outline-info" href="/signup">Sign up</a>
+            </form>
+
+            {% endif %}
 
         </div>
-
-        {% elif "/login" == url_for(request.endpoint) %}
-        {% else %}
-        <form class="form-inline my-2 my-lg-0" method="POST" action="/login">
-            {{ form.email(class='form-control', placeholder='email', style='margin-right:5px') }}
-            {{ form.password(class='form-control', placeholder='password', style='margin-right:5px') }}
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="margin-right:5px">Login</button>
-            <a class="btn btn-outline-info" href="/signup">Sign up</a>
-        </form>
-
-        {% endif %}
-
-    </div>
 </nav>
 <br>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success" role="alert">
+              {{ message }}
+          </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 {% endblock %}
 
 

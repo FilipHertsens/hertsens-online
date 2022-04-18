@@ -1,0 +1,43 @@
+{% extends "email/base.html" %}
+{% block content %}
+<h1>Repair request</h1>
+<br>
+<div class="container">
+<table class="table">
+  <thead class="thead-light">
+    <tr>
+      <th scope="col"></th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Asset</th>
+      <td>{{request.asset.name}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Requester</th>
+      <td>{{request.user.first_name}} {{request.user.last_name}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Description</th>
+      <td style="white-space:pre">{{request.description}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Time</th>
+      <td>{{request.request_time}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Demage Case</th>
+      <td>{{request.demage_case}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Depannage Required </th>
+      <td>{{request.depannage_required}}</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+{% endblock %}

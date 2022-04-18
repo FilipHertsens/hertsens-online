@@ -4,7 +4,7 @@ from flask_user import UserMixin, UserManager
 from flask_login import current_user
 from buttons import navbuttons
 from flask_admin.contrib.sqla import ModelView
-from tables import Checks
+from tables import Checks as Check_table
 from tables import Asset, Asset_brands, Asset_model, Asset_status, Asset_type, Check_cat, Person
 import time
 
@@ -17,7 +17,7 @@ def liinli(list1,list2):
 
 def getChecks(check_cat, asset):
 
-    checks = Checks.query.all()
+    checks = Check_table.query.all()
     check_list = []
     model = Asset_model.query.filter_by(id=asset.model)
     brand = Asset_brands.query.filter_by(id=asset.brand)
@@ -35,7 +35,6 @@ def getChecks(check_cat, asset):
                 if not liinli(list1[x], list2[x]):
                     valid = False
 
-
         if valid:
             check_list.append(check)
     return check_list
@@ -44,8 +43,8 @@ def getChecks(check_cat, asset):
 
 
 
-check_cat = Check_cat.query.filter_by(name='Walk around').first()
-asset = Asset.query.filter_by(name='D005').first()
+check_cat = Check_cat.query.filter_by(name='KOH').first()
+asset = Asset.query.filter_by(name='H079 demo banden').first()
 start_time = time.time()
 print(getChecks(check_cat=check_cat, asset=asset))
 print("--- %s seconds ---" % (time.time() - start_time))

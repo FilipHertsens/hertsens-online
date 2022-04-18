@@ -56,14 +56,3 @@ def SyncDBassets_Wacs():
             app_asset.milles = milles
             db.session.commit()
 
-
-
-
-
-
-
-
-
-
-
-SyncDBassets_Wacs()

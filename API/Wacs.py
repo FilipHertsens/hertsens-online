@@ -89,6 +89,3 @@ def UpdateKmById(AssetId, Km):
     else:
         return {"response": response, "code": 'error'}
 
-
-if __name__ == '__main__':
-    pass

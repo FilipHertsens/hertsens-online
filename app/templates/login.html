@@ -14,6 +14,7 @@
         {{ form.hidden_tag() }}
         {{ wtf.form_field(form.email) }}
         {{ wtf.form_field(form.password) }}
+        <input type="hidden" name="next" value="{{ request.args.get('next', '') }}"/>
         {% if error != None%}
             <div class="alert alert-danger" role="alert">
                 {{error}}

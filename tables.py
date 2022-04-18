@@ -1,10 +1,9 @@
 from app import db, app, admin
-from flask import abort, redirect
+from flask import abort, redirect, url_for
 from flask_user import UserMixin, UserManager
 from flask_login import current_user
 from buttons import navbuttons
 from flask_admin.contrib.sqla import ModelView
-from flask_admin.menu import MenuCategory, MenuView, MenuLink, SubMenuCategory
 
 
 user_roles = db.Table('user_roles',
@@ -67,20 +66,9 @@ type_asset_type = db.Table('type_asset_type',
     db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')),
     db.Column('asset_type_id', db.Integer(), db.ForeignKey('asset_type.id')))
 
-class User(UserMixin, db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
-    last_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
-    email = db.Column(db.String(50, collation='NOCASE'), unique=True)
-    email_confirmed_at = db.Column(db.DateTime())
-    password = db.Column(db.String(200))
-    roles = db.relationship('Role', secondary='user_roles', backref='premissions')
-    def __repr__(self):
-        return '{}{}'.format(self.first_name, self.last_name)
-
-    def get_navbarbuttons(self):
-        return navbuttons(self)
+user_assets = db.Table('user_assets',
+    db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')),
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')))
 
 
 class Role(db.Model):
@@ -158,11 +146,31 @@ class Asset(db.Model):
     brand = db.Column(db.Integer, db.ForeignKey('asset_brands.id'))
     model = db.Column(db.Integer, db.ForeignKey('asset_model.id'))
     status = db.Column(db.Integer, db.ForeignKey('asset_status.id'))
+    current_users = db.relationship('User', backref='current_asset')
     aggregaten = db.relationship('Aggregaat', secondary='asset_aggregaat', backref='assets')
     types = db.relationship('Asset_type', secondary='type_asset_type', backref='types')
+    repair_requests = db.relationship('Repair_request', backref='asset')
     def __repr__(self):
         return '{}'.format(self.name)
 
+
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
+    last_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
+    email = db.Column(db.String(50, collation='NOCASE'), unique=True)
+    email_confirmed_at = db.Column(db.DateTime())
+    password = db.Column(db.String(200))
+    roles = db.relationship('Role', secondary='user_roles', backref='premissions')
+    current_asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'))
+    favoriteassets = db.relationship('Asset', secondary='user_assets', backref='users')
+    repair_requests = db.relationship('Repair_request', backref='user')
+    def __repr__(self):
+        return '{}{}'.format(self.first_name, self.last_name)
+
+    def get_navbarbuttons(self):
+        return navbuttons(self)
 
 
 
@@ -219,6 +227,30 @@ class Check_cat(db.Model):
     def __repr__(self):
         return '{}'.format(self.name)
 
+class Status_request(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    repair_requests = db.relationship('Repair_request', backref='status')
+    def __repr__(self):
+        return '{}'.format(self.name)
+
+class Repair_request(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    description = db.Column(db.Text)
+    demage_case =  db.Column(db.Boolean, default=False, nullable=True)
+    depannage_required = db.Column(db.Boolean, default=False, nullable=True)
+    status_id = db.Column(db.Integer, db.ForeignKey('status_request.id'))
+    files = db.Column(db.Text)
+    submitter_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    request_time = db.Column(db.DateTime())
+    asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'))
+
+
+
+
+
+
+
 
 user_manager = UserManager(app, db, User)
 
@@ -234,7 +266,7 @@ open terminal
 class MyModelView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         # redirect to login page if user doesn't have access
-        return redirect('/login')
+        return redirect(url_for('login'))
     def is_accessible(self):
         if current_user.is_active:
             roless = current_user.roles
@@ -242,10 +274,11 @@ class MyModelView(ModelView):
                 if x.name == 'Admin':
                     return current_user.is_authenticated
                 else:
-                    return abort(404)
-            return abort(404)
+                    return False
+            return False
         else:
-            return abort(404)
+            return False
+
     def get_edit_userForm(self):
         form_user = ModelView(User, db.session).get_edit_form()
         print(form_user)
@@ -274,3 +307,7 @@ admin.add_sub_category(name="checks", parent_name="Checks")
 admin.add_view(MyModelView(Checks, db.session, category="Checks"))
 admin.add_view(MyModelView(Check_answers, db.session, category="Checks"))
 admin.add_view(MyModelView(Check_cat, db.session, category="Checks"))
+
+admin.add_sub_category(name="planning", parent_name="Planning")
+admin.add_view(MyModelView(Repair_request, db.session, category="Planning"))
+admin.add_view(MyModelView(Status_request, db.session, category="Planning"))
