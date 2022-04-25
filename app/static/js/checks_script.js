@@ -1,22 +1,22 @@
 var assets = [];
 
-var width = window.innerWidth
-|| document.documentElement.clientWidth
-|| document.body.clientWidth;
-
-var height = window.innerHeight
-|| document.documentElement.clientHeight
-|| document.body.clientHeight;
-
-console.log(height,width)
-console.log(window.location.href)
-
-
-$(window).on('load resize',function(){
-    if($(window).width() < 950){
-        window.location = window.location.href
-    }
-});
+//var width = window.innerWidth
+//|| document.documentElement.clientWidth
+//|| document.body.clientWidth;
+//
+//var height = window.innerHeight
+//|| document.documentElement.clientHeight
+//|| document.body.clientHeight;
+//
+//console.log(height,width)
+//console.log(window.location.href)
+//
+//
+//$(window).on('load resize',function(){
+//    if($(window).width() < 950){
+//        window.location = window.location.href
+//    }
+//});
 
 
 

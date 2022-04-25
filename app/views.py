@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functions import uploading_files, logged_in
 from flask_mail import Message
 from sending_mail import send_mail, send_repair_request
+from API.Balert import get_all_data
 
 
 @app.route('/')
@@ -70,16 +71,19 @@ def select_asset():
             if next_url:
                 return redirect(next_url)
         else:
-            error = 'No asset white this name.'
+            error = 'No asset withe this name.'
             form = Asset_selector()
             return render_template('select_asset.html', form=form, error=error, user=current_user)
         form = LoginForm()
         return render_template('index.html', user=current_user, form=form, error=error)
     else:
         get_asset = request.args.get("autocomplete")
+        next_url = request.args.get("next")
         if get_asset != None:
             current_user.current_asset = Asset.query.filter_by(id=get_asset).first()
             db.session.commit()
+            if next_url:
+                return redirect(next_url)
             return render_template('index.html', user=current_user, form=form)
         error = None
         return render_template('select_asset.html', form=form, error=error, user=current_user)
@@ -113,10 +117,16 @@ def checks():
 @logged_in
 def repairRequest():
     form = repair_request()
+    form2 = Asset_selector()
     if form.validate_on_submit():
         uploads = uploading_files(data=form.files.data)
+        asset_str = form2.autocomplete.data
+        asset = Asset.query.filter_by(name=asset_str).first()
+        if asset == None:
+            error = 'No asset withe this name.'
+            return render_template('repairrequest.html', error=error, user=current_user, form=form, form2=form2)
         r = Repair_request(
-            asset=current_user.current_asset,
+            asset=asset,
             description=form.description.data,
             demage_case=form.damage_case.data,
             depannage_required=form.depannage_required.data,
@@ -128,8 +138,23 @@ def repairRequest():
         db.session.commit()
         flash('Thanks for the repair request. We will get back to you as soon as possible')
         # send email
+        to = ["garage@hertsens.eu"]
         send_repair_request(request=r)
         return redirect(url_for('index'))
     error = None
-    return render_template('repairrequest.html', error=error, user=current_user, form=form)
+    return render_template('repairrequest.html', error=error, user=current_user, form=form, form2=form2)
 
+@app.route('/tirepressure')
+@logged_in
+def tirepressure():
+    error = None
+    if current_user.current_asset_id == None:
+        return redirect(url_for('select_asset', next=request.url))
+    tyres = get_all_data(name=current_user.current_asset)
+    con_tyres = []
+    if '@connected_to_id' in tyres:
+        if tyres['@connected_to_id'] != tyres['@id']:
+            con_tyres = get_all_data(id=tyres['@connected_to_id'])
+
+
+    return render_template('tirepressure.html', error=error, user=current_user, tyres=tyres, con_tyres=con_tyres)

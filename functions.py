@@ -13,12 +13,13 @@ def uploading_files(data):
         for file in data:
             if files_filenames != '':
                 files_filenames += ';\n'
-            filename = str(datetime.datetime.now().strftime("%d%m%Y_%H%M%S"))
-            ex = file.filename.split('.')[-1]
-            file_filename = secure_filename(f'{current_user.current_asset.name}__{int(x)}__{filename}.{ex}')
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_filename))
-            files_filenames += file_filename
-            x+=1
+            if file.filename != '':
+                filename = str(datetime.datetime.now().strftime("%d%m%Y_%H%M%S"))
+                ex = file.filename.split('.')[-1]
+                file_filename = secure_filename(f'{current_user.current_asset.name}__{int(x)}__{filename}.{ex}')
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_filename))
+                files_filenames += file_filename
+                x+=1
         return True, files_filenames
     except:
         return False, ''

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Tire pressure{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('.static', filename='css/tirestyle.css')}}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h3 class="form-signin-heading">Tire pressure</h3>
+        {% if tyres != [] %}
+        <div>
+            {% for x in tyres['@alerts'] %}
+            <i class="bi-wifi-off" style="color:{{x[1]}}">Bad connection to asset</i>
+            {% endfor %}
+            <h2>{{user.current_asset.name}}</h2>
+
+        </div>
+        {% else %}
+            <h2>No tire pressures for {{user.current_asset.name}}.</h2>
+        {% endif %}
+        <br>
+        <div id="tirebox">
+        </div>
+        <br>
+        {% if con_tyres != [] %}
+        <div>
+            {% for x in con_tyres['@alerts'] %}
+            <i class="bi-wifi-off" style="color:{{x[1]}}">Bad connection to asset</i>
+            {% endfor %}
+            <h2>{{con_tyres['@name']}}</h2>
+
+        </div>
+        {% endif %}
+        <div id="tirebox2">
+        </div>
+
+    </div> <!-- /container -->
+{% endblock %}
+
+{% block scripts %}
+<script src="https://kit.fontawesome.com/565a4a3be6.js" crossorigin="anonymous"></script>
+<script>
+function build(tyres, count_axle, element, nr) {
+
+    for (let i = 0; i < count_axle; i++) {
+        var id = 'axle_'+(i+1)
+        var tag = document.createElement("div");
+        tag.setAttribute('class','row')
+        tag.setAttribute('id',id)
+        var tire1 = document.createElement("div");
+        tire1.setAttribute('class','col coltire')
+        tire1.setAttribute('id',nr+(i+1)+'.3')
+        var tire2 = document.createElement("div");
+        tire2.setAttribute('class','col coltire')
+        tire2.setAttribute('id',nr+(i+1)+'.4')
+        var center = document.createElement("div");
+        center.setAttribute('class','col colcenter')
+        var tire3 = document.createElement("div");
+        tire3.setAttribute('class','col coltire')
+        tire3.setAttribute('id',nr+(i+1)+'.1')
+        var tire4 = document.createElement("div");
+        tire4.setAttribute('class','col coltire')
+        tire4.setAttribute('id',nr+(i+1)+'.2')
+        tag.appendChild(tire1);
+        tag.appendChild(tire2);
+        tag.appendChild(center);
+        tag.appendChild(tire3);
+        tag.appendChild(tire4);
+        element.appendChild(tag);
+        }
+
+    for (let i = 0; i < tyres['tire'].length; i++) {
+    var tagName = document.createElement("div");
+    var textName = document.createTextNode(tyres['tire'][i]['@position_name']);
+    tagName.appendChild(textName);
+    var tagPressure = document.createElement("div");
+    var textPressure = document.createTextNode(tyres['tire'][i]['@pressure']+' bar');
+    tagPressure.appendChild(textPressure);
+    var tagFilling = document.createElement("div");
+    var textFilling = document.createTextNode(Math.floor(tyres['tire'][i]['@fill_level']*100)+'%');
+    tagFilling.appendChild(textFilling);
+
+    var id = nr+tyres['tire'][i]['@position_on_vehicle'];
+    var tire_element = document.getElementById(id);
+    tire_element.classList.add("tire");
+    for (let r = 0; r < tyres['tire'][i]['@alerts'].length; r++) {
+
+        var img = document.createElement("img");
+        if(tyres['tire'][i]['@alerts'][r][0] === 'connection'){
+            img.setAttribute('src','/static/img/wifi-off.png')
+        }else if(tyres['tire'][i]['@alerts'][r][0] === 'temp'){
+            img.setAttribute('src','/static/img/high-temperature.png')
+        }else {
+            img.setAttribute('src','/static/img/TPMS.png')
+        }
+        if(tyres['tire'][i]['@alerts'][r][1] === 'red'){
+            tire_element.classList.add("alert");
+        }else {
+            tire_element.classList.add("warning");
+        }
+        img.setAttribute('width','auto')
+        img.setAttribute('height','25')
+        tire_element.appendChild(img);
+    }
+    tire_element.appendChild(tagName);
+    tire_element.appendChild(tagPressure);
+    tire_element.appendChild(tagFilling);
+    }
+}
+
+var tyres = {{tyres|tojson}};
+var con_tyres = {{con_tyres|tojson}};
+var element = document.getElementById("tirebox");
+var element2 = document.getElementById("tirebox2");
+
+if (tyres != []) {
+    var count_axle = tyres['tire'].slice(-1)[0]['@position_on_vehicle'].split('.')[0]
+    build(tyres=tyres, count_axle=count_axle, element=element, nr='1_')
+}
+
+if (con_tyres !=[]) {
+    var count_con_axle = con_tyres['tire'].slice(-1)[0]['@position_on_vehicle'].split('.')[0]
+    build(tyres=con_tyres, count_axle=count_con_axle, element=element2, nr='2_')
+}
+</script>
+{{super()}}
+{% endblock %}

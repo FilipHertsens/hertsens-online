@@ -1,20 +1,28 @@
 {% extends "email/base.html" %}
+
+{% block styles %}
+{{super()}}
+<style>
+  th {
+  text-align:right;
+  vertical-align: top;
+  margin: 5px;
+   }
+
+</style>
+
+{% endblock %}
+
+
 {% block content %}
+
 <h1>Repair request</h1>
 <br>
 <div class="container">
 <table class="table">
-  <thead class="thead-light">
-    <tr>
-      <th scope="col"></th>
-      <th scope="col"></th>
-      <th scope="col"></th>
-      <th scope="col"></th>
-    </tr>
-  </thead>
   <tbody>
     <tr>
-      <th scope="row">Asset</th>
+      <th style="text-align:right" scope="row">Asset</th>
       <td>{{request.asset.name}}</td>
     </tr>
     <tr>
@@ -23,11 +31,13 @@
     </tr>
     <tr>
       <th scope="row">Description</th>
-      <td style="white-space:pre">{{request.description}}</td>
+      <td style="white-space: pre-wrap">
+            {{request.description|safe}}
+      </td>
     </tr>
     <tr>
       <th scope="row">Time</th>
-      <td>{{request.request_time}}</td>
+      <td>{{request.time}}</td>
     </tr>
     <tr>
       <th scope="row">Demage Case</th>

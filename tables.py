@@ -5,87 +5,88 @@ from flask_login import current_user
 from buttons import navbuttons
 from flask_admin.contrib.sqla import ModelView
 
-
 user_roles = db.Table('user_roles',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
-    db.Column('roles_id', db.Integer(), db.ForeignKey('roles.id')))
+                      db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+                      db.Column('roles_id', db.Integer(), db.ForeignKey('roles.id')))
 
 role_navbarbuttons = db.Table('role_navbarbuttons',
-    db.Column('roles_id', db.Integer(), db.ForeignKey('roles.id')),
-    db.Column('button_id', db.Integer(), db.ForeignKey('navbarbutton.id')))
+                              db.Column('roles_id', db.Integer(), db.ForeignKey('roles.id')),
+                              db.Column('button_id', db.Integer(), db.ForeignKey('navbarbutton.id')))
 
 asset_aggregaat = db.Table('asset_aggregaat',
-    db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')),
-    db.Column('aggregaat_id', db.Integer(), db.ForeignKey('aggregaat.id')))
+                           db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')),
+                           db.Column('aggregaat_id', db.Integer(), db.ForeignKey('aggregaat.id')))
 
 check_answers_check = db.Table('check_answers_check',
-    db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
-    db.Column('check_answers_id', db.Integer(), db.ForeignKey('check_answers.id')))
+                               db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
+                               db.Column('check_answers_id', db.Integer(), db.ForeignKey('check_answers.id')))
 
 check_person = db.Table('check_person',
-    db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
-    db.Column('person_id', db.Integer(), db.ForeignKey('person.id')))
+                        db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
+                        db.Column('person_id', db.Integer(), db.ForeignKey('person.id')))
 
 check_type = db.Table('check_type',
-    db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
-    db.Column('Asset_type_id', db.Integer(), db.ForeignKey('asset_type.id')))
+                      db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
+                      db.Column('Asset_type_id', db.Integer(), db.ForeignKey('asset_type.id')))
 
 check_model = db.Table('check_model',
-    db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
-    db.Column('Asset_model_id', db.Integer(), db.ForeignKey('asset_model.id')))
+                       db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
+                       db.Column('Asset_model_id', db.Integer(), db.ForeignKey('asset_model.id')))
 
 check_assets = db.Table('check_assets',
-    db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
-    db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')))
+                        db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
+                        db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')))
 
 check_no_assets = db.Table('check_no_assets',
-    db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
-    db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')))
+                           db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
+                           db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')))
 
 check_aggregaten = db.Table('check_aggregaten',
-    db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
-    db.Column('aggregaat_id', db.Integer(), db.ForeignKey('aggregaat.id')))
+                            db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
+                            db.Column('aggregaat_id', db.Integer(), db.ForeignKey('aggregaat.id')))
 
 check_cat_checks = db.Table('check_cat_checks',
-    db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
-    db.Column('check_cat_id', db.Integer(), db.ForeignKey('check_cat.id')))
+                            db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
+                            db.Column('check_cat_id', db.Integer(), db.ForeignKey('check_cat.id')))
 
 check_roles = db.Table('check_roles',
-    db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('roles.id')))
+                       db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
+                       db.Column('role_id', db.Integer(), db.ForeignKey('roles.id')))
 
 check_brands = db.Table('check_brands',
-    db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
-    db.Column('asset_brands_id', db.Integer(), db.ForeignKey('asset_brands.id')))
+                        db.Column('check_id', db.Integer(), db.ForeignKey('checks.id')),
+                        db.Column('asset_brands_id', db.Integer(), db.ForeignKey('asset_brands.id')))
 
 person_type_person = db.Table('person_type_person',
-    db.Column('person_id', db.Integer(), db.ForeignKey('person.id')),
-    db.Column('person_type_id', db.Integer(), db.ForeignKey('person_type.id')))
+                              db.Column('person_id', db.Integer(), db.ForeignKey('person.id')),
+                              db.Column('person_type_id', db.Integer(), db.ForeignKey('person_type.id')))
 
 type_asset_type = db.Table('type_asset_type',
-    db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')),
-    db.Column('asset_type_id', db.Integer(), db.ForeignKey('asset_type.id')))
+                           db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')),
+                           db.Column('asset_type_id', db.Integer(), db.ForeignKey('asset_type.id')))
 
 user_assets = db.Table('user_assets',
-    db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')),
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')))
+                       db.Column('asset_id', db.Integer(), db.ForeignKey('asset.id')),
+                       db.Column('user_id', db.Integer(), db.ForeignKey('users.id')))
 
 
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
-    navbarbutton = db.relationship('Navbarbutton', secondary = 'role_navbarbuttons', backref='premissions')
+    navbarbutton = db.relationship('Navbarbutton', secondary='role_navbarbuttons', backref='premissions')
+
     def __repr__(self):
         return '{}'.format(self.name)
 
 
 class Navbarbutton(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(50), unique=True)
+    name = db.Column(db.String(50))
     new_tab = db.Column(db.Boolean, default=False, nullable=True)
-    href = db.Column(db.String(50),)
+    href = db.Column(db.String(50), )
     navbarcat_id = db.Column(db.Integer, db.ForeignKey('navbarcat.id'))
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -94,6 +95,7 @@ class Navbarcat(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
     buttons = db.relationship('Navbarbutton', backref='navbarcat')
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -102,6 +104,7 @@ class Asset_brands(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
     asset_id = db.relationship('Asset', backref='asset_brands')
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -110,6 +113,7 @@ class Asset_model(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
     asset_id = db.relationship('Asset', backref='asset_model')
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -117,6 +121,7 @@ class Asset_model(db.Model):
 class Asset_type(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -124,6 +129,7 @@ class Asset_type(db.Model):
 class Aggregaat(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -132,6 +138,7 @@ class Asset_status(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
     asset_id = db.relationship('Asset', backref='asset_status')
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -150,6 +157,7 @@ class Asset(db.Model):
     aggregaten = db.relationship('Aggregaat', secondary='asset_aggregaat', backref='assets')
     types = db.relationship('Asset_type', secondary='type_asset_type', backref='types')
     repair_requests = db.relationship('Repair_request', backref='asset')
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -166,12 +174,12 @@ class User(UserMixin, db.Model):
     current_asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'))
     favoriteassets = db.relationship('Asset', secondary='user_assets', backref='users')
     repair_requests = db.relationship('Repair_request', backref='user')
+
     def __repr__(self):
         return '{}{}'.format(self.first_name, self.last_name)
 
     def get_navbarbuttons(self):
         return navbuttons(self)
-
 
 
 class Person(UserMixin, db.Model):
@@ -182,6 +190,7 @@ class Person(UserMixin, db.Model):
     telegram_id = db.Column(db.String(50))
     email_confirmed_at = db.Column(db.DateTime())
     type = db.relationship('Person_type', secondary='person_type_person', backref='persons')
+
     def __repr__(self):
         return '{}{}'.format(self.first_name, self.last_name)
 
@@ -189,6 +198,7 @@ class Person(UserMixin, db.Model):
 class Person_type(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -209,6 +219,7 @@ class Checks(db.Model):
     incl_cat_checks = db.relationship('Check_cat', secondary='check_cat_checks', backref='checks')
     incl_roles = db.relationship('Role', secondary='check_roles', backref='checks')
     incl_brands = db.relationship('Asset_brands', secondary='check_brands', backref='checks')
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -217,6 +228,7 @@ class Check_answers(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(25), unique=True)
     description = db.Column(db.Text)
+
     def __repr__(self):
         return '{}'.format(self.name)
 
@@ -224,20 +236,24 @@ class Check_answers(db.Model):
 class Check_cat(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
+
     def __repr__(self):
         return '{}'.format(self.name)
+
 
 class Status_request(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
     repair_requests = db.relationship('Repair_request', backref='status')
+
     def __repr__(self):
         return '{}'.format(self.name)
+
 
 class Repair_request(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     description = db.Column(db.Text)
-    demage_case =  db.Column(db.Boolean, default=False, nullable=True)
+    demage_case = db.Column(db.Boolean, default=False, nullable=True)
     depannage_required = db.Column(db.Boolean, default=False, nullable=True)
     status_id = db.Column(db.Integer, db.ForeignKey('status_request.id'))
     files = db.Column(db.Text)
@@ -246,11 +262,10 @@ class Repair_request(db.Model):
     asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'))
 
 
-
-
-
-
-
+"""
+b9TYXFqDBuc9JdCB4oCutbZzx5h1mOAL9XZsTsFp
+class 
+"""
 
 user_manager = UserManager(app, db, User)
 
@@ -267,6 +282,7 @@ class MyModelView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         # redirect to login page if user doesn't have access
         return redirect(url_for('login'))
+
     def is_accessible(self):
         if current_user.is_active:
             roless = current_user.roles
@@ -281,9 +297,9 @@ class MyModelView(ModelView):
 
     def get_edit_userForm(self):
         form_user = ModelView(User, db.session).get_edit_form()
-        print(form_user)
         del form_user.password
         return form_user
+
 
 admin.add_sub_category(name="users", parent_name="Users")
 admin.add_view(MyModelView(User, db.session, category="Users"))
