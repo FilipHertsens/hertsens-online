@@ -47,8 +47,6 @@ def signup():
                        password=hashed_password,email_confirmed_at=datetime.datetime.now())
         db.session.add(new_user)
         db.session.commit()
-        send_mail()
-
         return redirect(url_for('index'))
 
     return render_template('signup.html', form=form,user=current_user)
