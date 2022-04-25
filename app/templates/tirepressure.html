@@ -8,13 +8,16 @@
 
 {% block content %}
     <div class="container">
+
         <h3 class="form-signin-heading">Tire pressure</h3>
         {% if tyres != [] %}
-        <div>
+        <br>
+        <div style="border: 1px solid #ccc!important; border-radius: 8px">
+        <div style="text-align: center">
             {% for x in tyres['@alerts'] %}
             <i class="bi-wifi-off" style="color:{{x[1]}}">Bad connection to asset</i>
             {% endfor %}
-            <h2>{{user.current_asset.name}}</h2>
+            <h3>{{user.current_asset.name}}</h3>
 
         </div>
         {% else %}
@@ -23,18 +26,24 @@
         <br>
         <div id="tirebox">
         </div>
+        </div>
         <br>
         {% if con_tyres != [] %}
-        <div>
+        <div style="border: 1px solid #ccc!important; border-radius: 8px" >
+        <div style="text-align: center">
             {% for x in con_tyres['@alerts'] %}
             <i class="bi-wifi-off" style="color:{{x[1]}}">Bad connection to asset</i>
             {% endfor %}
-            <h2>{{con_tyres['@name']}}</h2>
+            <h3>{{con_tyres['@name']}}</h3>
 
         </div>
         {% endif %}
         <div id="tirebox2">
         </div>
+        </div>
+        <br>
+        <br>
+        <br>
 
     </div> <!-- /container -->
 {% endblock %}
@@ -47,7 +56,7 @@ function build(tyres, count_axle, element, nr) {
     for (let i = 0; i < count_axle; i++) {
         var id = 'axle_'+(i+1)
         var tag = document.createElement("div");
-        tag.setAttribute('class','row')
+        tag.setAttribute('class','row axle')
         tag.setAttribute('id',id)
         var tire1 = document.createElement("div");
         tire1.setAttribute('class','col coltire')
