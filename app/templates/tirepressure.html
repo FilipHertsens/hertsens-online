@@ -8,20 +8,18 @@
 
 {% block content %}
     <div class="container">
-
-        <h3 class="form-signin-heading">Tire pressure</h3>
+        <h5 class="form-signin-heading">Tire pressure</h5>
         {% if tyres != [] %}
-        <br>
         <div style="border: 1px solid #ccc!important; border-radius: 8px">
         <div style="text-align: center">
             {% for x in tyres['@alerts'] %}
             <i class="bi-wifi-off" style="color:{{x[1]}}">Bad connection to asset</i>
             {% endfor %}
-            <h3>{{user.current_asset.name}}</h3>
+            <h4>{{user.current_asset.name}}</h4>
 
         </div>
         {% else %}
-            <h2>No tire pressures for {{user.current_asset.name}}.</h2>
+            <h3>No tire pressures for {{user.current_asset.name}}.</h3>
         {% endif %}
         <br>
         <div id="tirebox">
@@ -34,7 +32,7 @@
             {% for x in con_tyres['@alerts'] %}
             <i class="bi-wifi-off" style="color:{{x[1]}}">Bad connection to asset</i>
             {% endfor %}
-            <h3>{{con_tyres['@name']}}</h3>
+            <h4>{{con_tyres['@name']}}</h4>
 
         </div>
         {% endif %}
@@ -43,9 +41,42 @@
         </div>
         <br>
         <br>
+<!--        {{tyres}}-->
+<!--        {{con_tyres}}-->
         <br>
 
     </div> <!-- /container -->
+
+<div class="modal fade bd-example-modal-lg" id="tiremodal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tiremodal_title">test</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">Recipient:</label>
+            <input type="text" class="form-control" id="recipient-name">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="col-form-label">Message:</label>
+            <textarea class="form-control" id="message-text"></textarea>
+          </div>
+          <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -83,7 +114,12 @@ function build(tyres, count_axle, element, nr) {
     for (let i = 0; i < tyres['tire'].length; i++) {
     var tagName = document.createElement("div");
     var textName = document.createTextNode(tyres['tire'][i]['@position_name']);
-    tagName.appendChild(textName);
+    var a = document.createElement('a');
+    a.appendChild(textName);
+    a.classList.add("tiremodal");
+    a.title =tyres['tire'][i]['@id'];
+    a.href = "#";
+    tagName.appendChild(a);
     var tagPressure = document.createElement("div");
     var textPressure = document.createTextNode(tyres['tire'][i]['@pressure']+' bar');
     tagPressure.appendChild(textPressure);
@@ -132,6 +168,14 @@ if (tyres != []) {
 if (con_tyres !=[]) {
     var count_con_axle = con_tyres['tire'].slice(-1)[0]['@position_on_vehicle'].split('.')[0]
     build(tyres=con_tyres, count_axle=count_con_axle, element=element2, nr='2_')
+}
+
+var elements = document.getElementsByClassName ('tiremodal');
+for(var i = 0, len = elements.length; i < len; i++) {
+    elements[i].onclick = function () {
+        console.log(this);
+        $("#tiremodal").modal();
+    }
 }
 </script>
 {{super()}}

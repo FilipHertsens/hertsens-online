@@ -3,13 +3,18 @@
 
 {% block styles %}
 {{super()}}
-<link rel="stylesheet" href="{{url_for('.static', filename='css/style.css')}}">
+<!--<link rel="stylesheet" href="{{url_for('.static', filename='css/style.css')}}">-->
 {% endblock %}
 
 {% block content %}
-    <div class="container">
+<div class="container">
+    {% if user.current_asset != None %}
+    {% set asset = user.current_asset %}
+    {% else %}
+    {% set asset = '' %}
+    {% endif %}
 
-      <form method="POST" action="/repairRequest" enctype="multipart/form-data">
+    <form method="POST" action="/repairRequest" enctype="multipart/form-data">
         <h2 class="form-signin-heading">Repair request</h2>
         {{ form.hidden_tag() }}
         {{ wtf.form_field(form2.autocomplete, value=user.current_asset.name) }}
@@ -22,17 +27,13 @@
         <input type="hidden" name="next" value="{{ request.args.get('next', '') }}"/>
         <br>
         {% if error != None%}
-            <div class="alert alert-danger" role="alert">
-                {{error}}
-            </div>
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
         {% endif %}
         <button class="btn btn-lg btn-success btn-block" type="submit">Send</button>
-      </form>
+    </form>
 
-    </div> <!-- /container -->
+</div> <!-- /container -->
 {% endblock %}
 
-{% block scripts %}
-  {{ super() }} {# to load the parent assets #}
-  <script src="static/js/checks_script.js"></script>
-{% endblock %}

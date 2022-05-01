@@ -97,7 +97,7 @@ def getAssets():
     dictAsset = {}
     assets = Asset.query.all()
     for asset in assets:
-        dictAsset[asset.id] = asset.name
+        dictAsset[asset.id] = {'name':asset.name, 'id':asset.id}
     return dictAsset
 
 

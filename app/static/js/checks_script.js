@@ -1,37 +1,66 @@
-var assets = [];
+var assets = {}
+$.getJSON('/js/get/assets', function(data){
+    assets = data
+ });
 
-//var width = window.innerWidth
-//|| document.documentElement.clientWidth
-//|| document.body.clientWidth;
-//
-//var height = window.innerHeight
-//|| document.documentElement.clientHeight
-//|| document.body.clientHeight;
-//
-//console.log(height,width)
-//console.log(window.location.href)
-//
-//
-//$(window).on('load resize',function(){
-//    if($(window).width() < 950){
-//        window.location = window.location.href
-//    }
-//});
+function autocompletedropdown(inp, drop) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an assetsay of possible autocompleted values:*/
+  var currentFocus;
+
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists(val);
+      if (!val) {
+          h = document.createElement("h6");
+          h.setAttribute("class", "dropdown-header");
+          h.innerHTML = 'Type the asset number.';
+          drop.appendChild(h);
+          return false;}
+      currentFocus = -1;
+      /*for each item in the assetsay...*/
+
+      for (i = 1; i < Object.keys(assets).length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        /*if (assets[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {*/
+        if (assets[i]['name'].toUpperCase().includes(val.toUpperCase())){
+          let startposition = assets[i]['name'].toUpperCase().indexOf(val.toUpperCase());
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("a");
+          /*make the matching letters bold:*/
+          b.innerHTML = assets[i]['name'].substr(0,startposition);
+          b.innerHTML += "<strong>" + assets[i]['name'].substr(startposition, val.length) + "</strong>";
+          b.innerHTML += assets[i]['name'].substr(startposition+val.length, assets[i]['name'].length );
+          /*insert a input field that will hold the current assetsay item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + assets[i]['name'] + "'>";
+          b.setAttribute("class", "dropdown-item");
+          var ref = "/select_asset?autocomplete=" + assets[i]['id'] + "&next=" + window.location.href
+          b.setAttribute("href", ref);
+          drop.appendChild(b);
+          };
+        }
+        if (drop.firstChild == null){
+          m = document.createElement("h6");
+          m.setAttribute("class", "dropdown-header");
+          m.innerHTML = 'No asset found.';
+          drop.appendChild(m);
+        }
+
+      });
+
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document*/
+    var x = document.getElementById("autocomplete_dropdown");
+    while (x.firstChild) {
+        x.removeChild(x.firstChild);
+        }
+    }
+}
 
 
-
-
-function loadAssets(){
-	$.getJSON('/js/get/assets', function(data){
-	    $.each(data, function(key, value){
-	    assets.push(value);
-	    })
-    });
-};
-
-loadAssets()
-
-function autocomplete(inp, arr) {
+function autocomplete(inp) {
   /*the autocomplete function takes two arguments,
   the text field element and an array of possible autocompleted values:*/
   var currentFocus;
@@ -49,20 +78,19 @@ function autocomplete(inp, arr) {
       /*append the DIV element as a child of the autocomplete container:*/
       this.parentNode.appendChild(a);
       /*for each item in the array...*/
-      for (i = 0; i < arr.length; i++) {
+      for (i = 1; i < Object.keys(assets).length; i++) {
         /*check if the item starts with the same letters as the text field value:*/
         /*if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {*/
-
-        if (arr[i].toUpperCase().includes(val.toUpperCase())){
-          let startposition = arr[i].toUpperCase().indexOf(val.toUpperCase());
+        if (assets[i]['name'].toUpperCase().includes(val.toUpperCase())){
+          let startposition =  assets[i]['name'].toUpperCase().indexOf(val.toUpperCase());
           /*create a DIV element for each matching element:*/
           b = document.createElement("DIV");
           /*make the matching letters bold:*/
-          b.innerHTML = arr[i].substr(0,startposition);
-          b.innerHTML += "<strong>" + arr[i].substr(startposition, val.length) + "</strong>";
-          b.innerHTML += arr[i].substr(startposition+val.length, arr[i].length );
+          b.innerHTML =  assets[i]['name'].substr(0,startposition);
+          b.innerHTML += "<strong>" +  assets[i]['name'].substr(startposition, val.length) + "</strong>";
+          b.innerHTML +=  assets[i]['name'].substr(startposition+val.length,  assets[i]['name'].length );
           /*insert a input field that will hold the current array item's value:*/
-          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          b.innerHTML += "<input type='hidden' value='" +  assets[i]['name'] + "'>";
           /*execute a function when someone clicks on the item value (DIV element):*/
               b.addEventListener("click", function(e) {
               /*insert the value for the autocomplete text field:*/
@@ -126,16 +154,8 @@ function autocomplete(inp, arr) {
     }
   }
 }
-
-/*execute a function when someone clicks in the document:
-document.addEventListener("click", function (e) {
-    closeAllLists(e.target);
-});
-
-*/
 }
-/*An array containing ingredients*/
-autocomplete(document.getElementById("autocomplete"), assets);
 
-
+autocomplete(document.getElementById("autocomplete"));
+autocompletedropdown(document.getElementById("autocomplete_input"), document.getElementById("autocomplete_dropdown"));
 

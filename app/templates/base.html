@@ -4,16 +4,9 @@
 {% block styles %}
 {{super()}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-<style>
-
-
-</style>
-
+<link rel="stylesheet" href="{{url_for('.static', filename='css/style.css')}}">
 {% endblock %}
-
 {% block navbar %}
-
-
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="/">
@@ -42,9 +35,9 @@
             </li>
             {% else %}
             {% for button in user.get_navbarbuttons()[buttongroup] %}
-                <a class="nav-link" target={{button['new_tab']}}
-                   href={{button['href']}}>{{button['name']}}
-                    <span class="sr-only"></span></a>
+            <a class="nav-link" target={{button['new_tab']}}
+               href={{button['href']}}>{{button['name']}}
+                <span class="sr-only"></span></a>
             {% endfor %}
             {% endif %}
             {% endfor %}
@@ -53,13 +46,50 @@
 
 
         {% if user.is_active %}
-        <div class="dropdown">
+
+        <div class="btn-group" style="margin-right: 5px">
+            {% if user.current_asset != None %}
+            {% set asset = user.current_asset.name %}
+            {% else %}
+            {% set asset = '' %}
+            {% endif %}
+
+            <div class="dropdown">
+                <form class="form-inline my-2 my-lg-0" action="#" data-toggle="dropdown" aria-haspopup="true"
+                      aria-expanded="false">
+                    <input type="text" class="form-control nav-item" id='autocomplete_input' placeholder="Search asset"
+                           aria-label="Username"
+                           aria-describedby="basic-addon1" value="{{asset}}" style="color: white; background-color:transparent;
+                   border-radius: .25rem 0rem 0rem .25rem">
+                </form>
+                <div class="dropdown-menu" id="autocomplete_dropdown">
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button type="button" class="btn btn-outline-light my-2 my-sm-0 dropdown-toggle dropdown-toggle-split"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="sr-only">Toggle Dropright</span>
+                </button>
+                <div class="dropdown-menu" style="right:0; left:auto">
+                    <h6 class="dropdown-header">Favorieten</h6>
+                    {% for favoriet in user.favoriteassets %}
+                    {% set ref = "/select_asset?autocomplete=" + favoriet.id|string + "&next=" + request.url %}
+                    <a class="dropdown-item" href={{ref}}>{{favoriet.name}}</a>
+
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="dropdown" hidden>
             <a class="btn btn-outline-light my-2 my-sm-0" href="#" id="navbarDropdownMenuLink1" data-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false" style="margin-right: 5px">
                 {% if user.current_asset != None %}
-                    {{user.current_asset}}
+                {{user.current_asset}}
                 {% else %}
-                    Asset
+                Asset
                 {% endif %}
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" style="right:0; left:auto">
@@ -98,17 +128,24 @@
             {% endif %}
 
         </div>
+    </div>
 </nav>
-<br>
+
 {% with messages = get_flashed_messages() %}
-  {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-success" role="alert">
-              {{ message }}
-          </div>
-    {% endfor %}
-  {% endif %}
+{% if messages %}
+<br>
+{% for message in messages %}
+<div class="alert alert-success" role="alert">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
 {% endwith %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }} {# to load the parent assets #}
+<script src="static/js/checks_script.js"></script>
 {% endblock %}
 
 
