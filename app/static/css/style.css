@@ -2,6 +2,11 @@ body {
   font: 16px Arial;
 }
 
+.modalalert {
+  margin: 0px;
+  padding: 0px
+}
+
 .autocomplete {
   /*the container must be positioned relative:*/
   position: relative;

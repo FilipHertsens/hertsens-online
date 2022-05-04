@@ -7,10 +7,10 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h5 class="form-signin-heading">Tire pressure</h5>
-        {% if tyres != [] %}
-        <div style="border: 1px solid #ccc!important; border-radius: 8px">
+<div class="container">
+    <h5 class="form-signin-heading">Tire pressure</h5>
+    {% if tyres != [] %}
+    <div style="border: 1px solid #ccc!important; border-radius: 8px">
         <div style="text-align: center">
             {% for x in tyres['@alerts'] %}
             <i class="bi-wifi-off" style="color:{{x[1]}}">Bad connection to asset</i>
@@ -19,15 +19,15 @@
 
         </div>
         {% else %}
-            <h3>No tire pressures for {{user.current_asset.name}}.</h3>
+        <h3>No tire pressures for {{user.current_asset.name}}.</h3>
         {% endif %}
         <br>
         <div id="tirebox">
         </div>
-        </div>
-        <br>
-        {% if con_tyres != [] %}
-        <div style="border: 1px solid #ccc!important; border-radius: 8px" >
+    </div>
+    <br>
+    {% if con_tyres != [] %}
+    <div style="border: 1px solid #ccc!important; border-radius: 8px">
         <div style="text-align: center">
             {% for x in con_tyres['@alerts'] %}
             <i class="bi-wifi-off" style="color:{{x[1]}}">Bad connection to asset</i>
@@ -38,43 +38,100 @@
         {% endif %}
         <div id="tirebox2">
         </div>
-        </div>
-        <br>
-        <br>
-<!--        {{tyres}}-->
-<!--        {{con_tyres}}-->
-        <br>
-
-    </div> <!-- /container -->
-
-<div class="modal fade bd-example-modal-lg" id="tiremodal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="tiremodal_title">test</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="recipient-name" class="col-form-label">Recipient:</label>
-            <input type="text" class="form-control" id="recipient-name">
-          </div>
-          <div class="form-group">
-            <label for="message-text" class="col-form-label">Message:</label>
-            <textarea class="form-control" id="message-text"></textarea>
-          </div>
-          <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-
-        </form>
-      </div>
-
     </div>
-  </div>
+    <br>
+    <br>
+    <!--        {{tyres}}-->
+    <!--        {{con_tyres}}-->
+    <br>
+
+</div> <!-- /container -->
+
+<div class="modal fade bd-example-modal-lg" id="tiremodal" tabindex="-1" role="dialog"
+     aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col">
+                <h5 class="modal-title" id="tiremodal_title">tire position @ asset</h5>
+                </div>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label class="col-form-label" style="width:150px">Pressure:</label>
+                    </div>
+                    <div class="col-auto">
+                        <span id="modalPressure" class="form-text">
+                          ? Bar
+                        </span>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label class="col-form-label" style="width:150px">Filling Degree:</label>
+                    </div>
+                    <div class="col-auto">
+                        <span id="modalFillingdegree" class="form-text">
+                          ? %
+                        </span>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label class="col-form-label" style="width:150px">Ideal Pressure:</label>
+                    </div>
+                    <div class="col-auto">
+                        <span id="modalIdealpressure" class="form-text">
+                          ? Bar
+                        </span>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label class="col-form-label" style="width:150px">External Temperature:</label>
+                    </div>
+                    <div class="col-auto">
+                        <span id="modalExternaltemperature" class="form-text">
+                          ? °c
+                        </span>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label class="col-form-label" style="width:150px">Internal Temperature:</label>
+                    </div>
+                    <div class="col-auto">
+                        <span id="modalInternaltemperature" class="form-text">
+                          ? °c
+                        </span>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label class="col-form-label" style="width:150px">Time measurement:</label>
+                    </div>
+                    <div class="col-auto">
+                        <span id="modalTimemeasurement" class="form-text">
+                          ? °c
+                        </span>
+                    </div>
+                </div>
+                <br>
+                <div>
+                    <img src="static/img/loadingpage.jpg" alt="Trulli" width="100%" height="auto" style="display: block; margin-left: auto; margin-right:auto">
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -112,17 +169,25 @@ function build(tyres, count_axle, element, nr) {
         }
 
     for (let i = 0; i < tyres['tire'].length; i++) {
+    var tagtiredata = document.createElement("input");
+    tagtiredata.value = JSON.stringify(tyres['tire'][i]);
+    tagtiredata.style.display = "none";
+
     var tagName = document.createElement("div");
     var textName = document.createTextNode(tyres['tire'][i]['@position_name']);
     var a = document.createElement('a');
+    a.appendChild(tagtiredata);
     a.appendChild(textName);
     a.classList.add("tiremodal");
     a.title =tyres['tire'][i]['@id'];
     a.href = "#";
+
     tagName.appendChild(a);
+
     var tagPressure = document.createElement("div");
     var textPressure = document.createTextNode(tyres['tire'][i]['@pressure']+' bar');
     tagPressure.appendChild(textPressure);
+
     var tagFilling = document.createElement("div");
     var textFilling = document.createTextNode(Math.floor(tyres['tire'][i]['@fill_level']*100)+'%');
     tagFilling.appendChild(textFilling);
@@ -160,23 +225,64 @@ var con_tyres = {{con_tyres|tojson}};
 var element = document.getElementById("tirebox");
 var element2 = document.getElementById("tirebox2");
 
-if (tyres != []) {
+if ('tire' in tyres) {
     var count_axle = tyres['tire'].slice(-1)[0]['@position_on_vehicle'].split('.')[0]
     build(tyres=tyres, count_axle=count_axle, element=element, nr='1_')
 }
 
-if (con_tyres !=[]) {
+
+if ('tire' in con_tyres) {
     var count_con_axle = con_tyres['tire'].slice(-1)[0]['@position_on_vehicle'].split('.')[0]
     build(tyres=con_tyres, count_axle=count_con_axle, element=element2, nr='2_')
 }
 
 var elements = document.getElementsByClassName ('tiremodal');
+var modalTitel = document.getElementById("tiremodal_title");
 for(var i = 0, len = elements.length; i < len; i++) {
     elements[i].onclick = function () {
-        console.log(this);
+        var ele = ["#modalPressure","#modalTimemeasurement","#modalInternaltemperature"]
+        for( e in ele){
+            $(ele[e])[0].parentElement.parentElement.classList.remove("alert")
+            $(ele[e])[0].parentElement.parentElement.classList.remove("modalalert")
+            $(ele[e])[0].parentElement.parentElement.classList.remove("warning")
+            $(ele[e])[0].parentElement.parentElement.classList.remove("tire")
+            }
+
+        var element = this.getElementsByTagName('input')[0];
+        var tireElement = JSON.parse(element.value);
+        modalTitel.innerText = this.innerText + ' @ ' + tireElement['@vehicleName'];
+        console.log(tireElement);
+        $("#modalPressure")[0].innerHTML = tireElement['@pressure'] + ' bar';
+        $("#modalFillingdegree")[0].innerHTML = tireElement['@fill_level']*100 + ' %';
+        $("#modalIdealpressure")[0].innerHTML = tireElement['@recommended_pressure'] + ' bar';
+        $("#modalExternaltemperature")[0].innerHTML = tireElement['@external_temperature'] + ' °c';
+        $("#modalInternaltemperature")[0].innerHTML = tireElement['@internal_temperature'] + ' °c';
+        $("#modalTimemeasurement")[0].innerHTML = tireElement['@time'];
+        for(var j = 0, len = tireElement['@alerts'].length; j < len; j++) {
+            var type = tireElement['@alerts'][j][0]
+            var color = tireElement['@alerts'][j][1]
+            var parent = $("#modalPressure")[0].parentElement.parentElement
+            if (type == 'tire'){
+                var parent = $("#modalPressure")[0].parentElement.parentElement
+            }else if(type == 'connection'){
+                var parent = $("#modalTimemeasurement")[0].parentElement.parentElement
+            }else if(type == 'temp'){
+                var parent = $("#modalInternaltemperature")[0].parentElement.parentElement
+            }
+            parent.classList.add("modalalert")
+            parent.classList.add("tire")
+            if (color == 'orange'){
+                parent.classList.add("warning")
+            }else {
+                parent.classList.add("alert")
+            }
+            console.log(tireElement);
+        }
         $("#tiremodal").modal();
     }
 }
+
+
 </script>
 {{super()}}
 {% endblock %}

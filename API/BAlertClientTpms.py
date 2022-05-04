@@ -156,11 +156,12 @@ class BAlertClient:
         get all the measurement for a given tire by id
         Returns the XML answer from server.  Throws a RuntimeError when the call fails (for instance, server cannot be contacted).
         """
+
         time_stamp = self._generateTimestamp()
         nonce = self._generateNonce()
-        hash = self._generateHash(password, time_stamp, nonce )
+        hash = self._generateHash(password.encode(), time_stamp, nonce )
         api_key = self.api_key
-        user = base64.b64encode(user)
+        user = base64.b64encode(user.encode())
         user = user.decode('utf-8')
         fromId, toId= None, None
         fromTime, toTime = None, None

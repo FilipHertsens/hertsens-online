@@ -149,10 +149,13 @@ def tirepressure():
     if current_user.current_asset_id == None:
         return redirect(url_for('select_asset', next=request.url))
     tyres = get_all_data(name=current_user.current_asset)
-    con_tyres = []
-    if '@connected_to_id' in tyres:
-        if tyres['@connected_to_id'] != tyres['@id']:
-            con_tyres = get_all_data(id=tyres['@connected_to_id'])
+    con_tyres = None
+    if tyres != None:
+        if '@connected_to_id' in tyres:
+            if tyres['@connected_to_id'] != tyres['@id']:
+                con_tyres = get_all_data(id=tyres['@connected_to_id'])
+
+
 
 
     return render_template('tirepressure.html', error=error, user=current_user, tyres=tyres, con_tyres=con_tyres)

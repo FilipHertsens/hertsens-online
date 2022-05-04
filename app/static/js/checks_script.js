@@ -50,7 +50,7 @@ function autocompletedropdown(inp, drop) {
 
       });
 
-  function closeAllLists(elmnt) {
+  function closeAllLists() {
     /*close all autocomplete lists in the document*/
     var x = document.getElementById("autocomplete_dropdown");
     while (x.firstChild) {
@@ -155,7 +155,9 @@ function autocomplete(inp) {
   }
 }
 }
-
-autocomplete(document.getElementById("autocomplete"));
+var autocomp = document.getElementById("autocomplete")
+if (autocomp != null) {
+autocomplete(autocomp);
+}
 autocompletedropdown(document.getElementById("autocomplete_input"), document.getElementById("autocomplete_dropdown"));
 

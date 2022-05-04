@@ -80,10 +80,14 @@ def Add_vehicle_alerts(xml):
     return xml
 
 def Add_tire_alerts(xml):
+    now = datetime.datetime.utcnow()
+    nu = datetime.datetime.now()
+    timezoneDifferents = (nu - now)
     for tire in xml['tire']:
         tire['@alerts'] = []
         last_connection = datetime.datetime.strptime(tire['@time_stamp'], '%Y-%m-%d %H:%M:%S')
-        now = datetime.datetime.utcnow()
+        tire['@time'] = (last_connection + timezoneDifferents).strftime("%d/%m/%y %H:%M")
+        tire['@vehicleName'] = xml['@name']
         if float(tire['@fill_level']) < 0.91:
             error = ['tire','orange']
             if float(tire['@fill_level']) < 0.7:
@@ -123,5 +127,13 @@ def get_all_data(name=None, id=None):
         return data
     return []
 
+
+
 vehicle = get_vehicles()
 tire_names = get_tire_names()
+# tireId = 925
+# dt = datetime.datetime.now()
+# ts = datetime.datetime.timestamp(dt)
+# fromIdOrTime = '2022-03-27 12:08:44'
+# toIdOrTime = '2022-03-27 15:08:44'
+# print(balertClient.getTireMeasurements(user, password, tireId, fromIdOrTime, toIdOrTime, count=5))
