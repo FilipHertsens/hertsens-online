@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, flash, current_app
+from flask import render_template, redirect, url_for, request, flash, current_app, Response
 from flask_login import login_user, logout_user, current_user
 from flask_user import roles_required
 from forms import LoginForm, RegisterForm, Asset_selector, repair_request
@@ -9,7 +9,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functions import uploading_files, logged_in
 from flask_mail import Message
 from sending_mail import send_mail, send_repair_request
-from API.Balert import get_all_data
+from API.Balert import get_all_data, fig_band
+import io
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
 
 
 @app.route('/')
@@ -99,6 +102,14 @@ def getAssets():
     for asset in assets:
         dictAsset[asset.id] = {'name':asset.name, 'id':asset.id}
     return dictAsset
+
+@app.route('/js/get/tireimg/<id>')
+def tireImg(id):
+
+    fig = fig_band(int(id))
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
 
 
 @app.route('/checks')

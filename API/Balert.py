@@ -4,7 +4,12 @@ import xml.etree.ElementTree as ET
 import xmltodict
 from pprint import pprint
 import datetime
-
+import os
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from matplotlib.figure import Figure
 
 # usage of the API below
 server = "api.balert.net"  # address of server hosting the API
@@ -127,13 +132,68 @@ def get_all_data(name=None, id=None):
         return data
     return []
 
+def get_tire_measurements(tireId):
+    count = 250
+    fromIdOrTime = None
+    toIdOrTime = None
+    names = balertClient.getTireMeasurements(user, password, tireId, fromIdOrTime, toIdOrTime, count )
+    tire_names_json = xmltodict.parse(names)
+    return tire_names_json
+
+def band_metingen(tireId):
+    data = get_tire_measurements(tireId)
+    tup = list(data.items())
+    for x, y in dict(tup).items():
+        tupp = dict(list(y.items()))
+        if tupp['@stat'] == 'ok':
+            metingen = json.loads(json.dumps(tupp['measurement']))
+            return metingen
+
+
+def fig_band(tireId):
+
+    now = datetime.datetime.utcnow()
+    nu = datetime.datetime.now()
+    timezoneDifferents = (nu - now)
+    title = f'tyre id {tireId}'
+    df = pd.DataFrame(band_metingen(tireId))
+    df['pressure'] = df['@pressure'].astype('float')
+    df['external_temperature'] = df['@external_temperature'].astype('float')
+    df['internal_temperature'] = df['@internal_temperature'].astype('float')
+    df['fill_level'] = df['@fill_level'].astype('float') * 100
+    df['time_stamp'] = df['@time_stamp'].astype('datetime64[ns]')
+    df['time_stamp'] = df['time_stamp'] + timezoneDifferents
+    df['ideale'] = pd.Series([100 for x in range(len(df.pressure))])
+    dfm = df[['pressure', 'time_stamp', 'fill_level', 'external_temperature', 'internal_temperature', 'ideale']]
+
+    x = dfm['time_stamp']
+    y1 = dfm['pressure']
+    y2 = dfm['fill_level']
+    y3 = dfm['external_temperature']
+    y4 = dfm['internal_temperature']
+    y5 = dfm['ideale']
+    fig, ax1 = plt.subplots(figsize=(15, 10), constrained_layout=True)
+    ax2 = ax1.twinx()
+
+    curve1 = ax1.plot(x, y1, label='Pressure', color='Lightskyblue')
+    curve2 = ax2.plot(x, y2, label='Filling Degree', color='Red')
+    curve3 = ax2.plot(x, y3, label='External Temperature', color='Gold')
+    curve4 = ax2.plot(x, y4, label='Internal Temperature', color='Dimgray')
+    curve5 = ax2.plot(x, y5, '--', label='Ideal Pressure', color='Dimgray')
+
+    curves = curve1 + curve4 + curve3 + curve2 + curve5
+    labs = [l.get_label() for l in curves]
+    ax1.legend(curves, labs, bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=2, mode='expand', borderaxespad=0.)
+
+    formatter = mdates.DateFormatter("%d-%m %H:%M")
+    ax1.xaxis.set_major_formatter(formatter)
+    ax1.tick_params(labelrotation=30)
+    ax1.set_ylabel('Pressure (bar)')
+    ax2.set_ylabel('Temperature (°C)')
+    ax1.set_title(title, y=1, pad=70, fontsize=20)
+    return fig
 
 
 vehicle = get_vehicles()
 tire_names = get_tire_names()
-# tireId = 925
-# dt = datetime.datetime.now()
-# ts = datetime.datetime.timestamp(dt)
-# fromIdOrTime = '2022-03-27 12:08:44'
-# toIdOrTime = '2022-03-27 15:08:44'
-# print(balertClient.getTireMeasurements(user, password, tireId, fromIdOrTime, toIdOrTime, count=5))
+

@@ -37,7 +37,6 @@ app.config['USER_EMAIL_SENDER_EMAIL'] = 'garage@hertsens.eu'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
 
-
 mail = Mail()
 mail.init_app(app)
 admin = Admin(app)

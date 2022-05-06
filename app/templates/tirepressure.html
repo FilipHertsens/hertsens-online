@@ -124,8 +124,7 @@
                 </div>
                 <br>
                 <div>
-                    <img src="static/img/loadingpage.jpg" alt="Trulli" width="100%" height="auto" style="display: block; margin-left: auto; margin-right:auto">
-
+                    <img id=modaltirefig src="" alt="Trulli" width="100%" height="auto" style="display: block; margin-left: auto; margin-right:auto">
                 </div>
 
             </div>
@@ -140,7 +139,6 @@
 <script src="https://kit.fontawesome.com/565a4a3be6.js" crossorigin="anonymous"></script>
 <script>
 function build(tyres, count_axle, element, nr) {
-
     for (let i = 0; i < count_axle; i++) {
         var id = 'axle_'+(i+1)
         var tag = document.createElement("div");
@@ -247,11 +245,9 @@ for(var i = 0, len = elements.length; i < len; i++) {
             $(ele[e])[0].parentElement.parentElement.classList.remove("warning")
             $(ele[e])[0].parentElement.parentElement.classList.remove("tire")
             }
-
         var element = this.getElementsByTagName('input')[0];
         var tireElement = JSON.parse(element.value);
         modalTitel.innerText = this.innerText + ' @ ' + tireElement['@vehicleName'];
-        console.log(tireElement);
         $("#modalPressure")[0].innerHTML = tireElement['@pressure'] + ' bar';
         $("#modalFillingdegree")[0].innerHTML = tireElement['@fill_level']*100 + ' %';
         $("#modalIdealpressure")[0].innerHTML = tireElement['@recommended_pressure'] + ' bar';
@@ -276,8 +272,8 @@ for(var i = 0, len = elements.length; i < len; i++) {
             }else {
                 parent.classList.add("alert")
             }
-            console.log(tireElement);
         }
+        $("#modaltirefig")[0].src = '/js/get/tireimg/'+tireElement['@id'];
         $("#tiremodal").modal();
     }
 }
