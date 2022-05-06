@@ -165,8 +165,9 @@ def tirepressure():
         if '@connected_to_id' in tyres:
             if tyres['@connected_to_id'] != tyres['@id']:
                 con_tyres = get_all_data(id=tyres['@connected_to_id'])
-
-
-
-
     return render_template('tirepressure.html', error=error, user=current_user, tyres=tyres, con_tyres=con_tyres)
+
+@app.route('/account')
+@logged_in
+def account():
+    return render_template('account.html', user=current_user)

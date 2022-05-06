@@ -69,40 +69,23 @@
 
             <div class="dropdown">
                 <button type="button" class="btn btn-outline-light my-2 my-sm-0 dropdown-toggle dropdown-toggle-split"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-radius: 0rem 0.25rem 0.25rem 0rem;">
                     <span class="sr-only">Toggle Dropright</span>
                 </button>
-                <div class="dropdown-menu" style="right:0; left:auto">
+                <div class="dropdown-menu" style="right:-50px; left:auto">
                     <h6 class="dropdown-header">Favorieten</h6>
                     {% for favoriet in user.favoriteassets %}
                     {% set ref = "/select_asset?autocomplete=" + favoriet.id|string + "&next=" + request.url %}
                     <a class="dropdown-item" href={{ref}}>{{favoriet.name}}</a>
-
                     {% endfor %}
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/select_asset">Asset selector</a>
                 </div>
             </div>
         </div>
 
 
-        <div class="dropdown" hidden>
-            <a class="btn btn-outline-light my-2 my-sm-0" href="#" id="navbarDropdownMenuLink1" data-toggle="dropdown"
-               aria-haspopup="true" aria-expanded="false" style="margin-right: 5px">
-                {% if user.current_asset != None %}
-                {{user.current_asset}}
-                {% else %}
-                Asset
-                {% endif %}
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" style="right:0; left:auto">
-                <h6 class="dropdown-header">Favorieten</h6>
-                {% for favoriet in user.favoriteassets %}
-                {% set ref = "/select_asset?autocomplete=" + favoriet.id|string + "&next=" + request.url %}
-                <a class="dropdown-item" href={{ref}}>{{favoriet.name}}</a>
-                {% endfor %}
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="/select_asset">Asset selector</a>
-            </div>
-        </div>
+
 
 
         <div class="nav-item dropdown">
@@ -111,7 +94,7 @@
                 {{user.first_name}} {{user.last_name}}
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" style="right:0; left:auto">
-                <a class="dropdown-item" href="/">Account</a>
+                <a class="dropdown-item" href="/account">Account</a>
                 <a class="dropdown-item" href="/logout">Logout</a>
             </div>
 
