@@ -6,7 +6,7 @@ from PIL import Image
 from flask_login import current_user
 from functools import wraps
 from flask import render_template, redirect, url_for, request, session
-import platform
+
 
 def uploading_files(data):
     files_filenames = ''
