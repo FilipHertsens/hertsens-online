@@ -6,6 +6,7 @@ from PIL import Image
 from flask_login import current_user
 from functools import wraps
 from flask import render_template, redirect, url_for, request, session
+import platform
 
 def uploading_files(data):
     files_filenames = ''
@@ -25,14 +26,13 @@ def uploading_files(data):
                     if new_size_ratio < 1:
                         img = img.resize((int(img.size[0] * new_size_ratio), int(img.size[1] * new_size_ratio)),
                                      Image.ANTIALIAS)
-                        print("[+] New Image shape:", img.size)
                     if file.filename.split('.')[-1][1] != 'jpg':
                         # change the extension to JPEG
                         file_filename = f"{file_filename}.jpg"
-                    img.save(os.path.join('uploads', file_filename), quality=90, optimize=True)
+                    img.save(os.path.join(app.config['UPLOAD_FOLDER'], file_filename), quality=90, optimize=True)
                 else:
                     file_filename = f"{file_filename}.{ex}"
-                    file.save(os.path.join('uploads', file_filename))
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_filename))
                 files_filenames += file_filename
 
                 x+=1

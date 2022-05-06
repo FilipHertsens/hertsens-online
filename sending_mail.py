@@ -26,7 +26,7 @@ def add_files(msg,file_filenames):
 
     for file_filename in file_filenames:
         # file_name = os.path.join(app.config['UPLOAD_FOLDER'], file_filename)
-        file_filename = os.path.join('uploads', file_filename)
+        file_filename = os.path.join(app.config['UPLOAD_FOLDER'], file_filename)
         mimetype = filetype.guess(file_filename)
         file_size = os.path.getsize(file_filename)
         attsize += file_size

@@ -12,7 +12,7 @@ from flask_babelex import Babel
 from flask_migrate import Migrate
 from datetime import timedelta
 from flask_user import UserManager
-
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
@@ -34,7 +34,8 @@ app.config['USER_ENABLE_EMAIL'] = True
 app.config['USER_ENABLE_USERNAME'] = False
 app.config['USER_EMAIL_SENDER_NAME'] = "Hertsens Online"
 app.config['USER_EMAIL_SENDER_EMAIL'] = 'garage@hertsens.eu'
-app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads')
+
 
 
 mail = Mail()
