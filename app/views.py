@@ -50,6 +50,7 @@ def signup():
                        password=hashed_password,email_confirmed_at=datetime.datetime.now())
         db.session.add(new_user)
         db.session.commit()
+        flash('Thanks for signing up. \nThe administrator will review it as soon as possible.', "alert alert-warning")
         return redirect(url_for('index'))
 
     return render_template('signup.html', form=form,user=current_user)
@@ -145,7 +146,7 @@ def repairRequest():
             request_time = datetime.datetime.now()
         )
         db.session.commit()
-        flash('Thanks for the repair request. We will get back to you as soon as possible')
+        flash('Thanks for the repair request. We will get back to you as soon as possible', "alert alert-success")
         # send email
         to = ["garage@hertsens.eu"]
         send_repair_request(request=r)
@@ -171,3 +172,10 @@ def tirepressure():
 @logged_in
 def account():
     return render_template('account.html', user=current_user)
+
+@app.route('/assetlocation')
+@logged_in
+def assetlocation():
+    lat = '51.189125'
+    lon = '6.840169'
+    return render_template('assetlocation.html', user=current_user, lat=lat, lon=lon)
