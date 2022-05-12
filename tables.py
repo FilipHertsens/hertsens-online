@@ -4,6 +4,8 @@ from flask_user import UserMixin, UserManager
 from flask_login import current_user
 from buttons import navbuttons
 from flask_admin.contrib.sqla import ModelView
+from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
 
 user_roles = db.Table('user_roles',
                       db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
