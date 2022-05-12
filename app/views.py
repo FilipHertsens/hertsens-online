@@ -6,13 +6,13 @@ from tables import User, Asset, Repair_request, Status_request
 import datetime
 from app import app, db, mail
 from werkzeug.security import generate_password_hash, check_password_hash
-from functions import uploading_files, logged_in
+from functions import uploading_files, logged_in, getLocation
 from flask_mail import Message
 from sending_mail import send_mail, send_repair_request
 from API.Balert import get_all_data, fig_band
 import io
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-
+from pprint import pprint
 
 
 @app.route('/')
@@ -31,7 +31,6 @@ def login():
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember.data)
                 if next_url:
-                    print(next_url)
                     return redirect(next_url)
                 return redirect(url_for('index'))
             else:
@@ -161,6 +160,7 @@ def tirepressure():
     if current_user.current_asset_id == None:
         return redirect(url_for('select_asset', next=request.url))
     tyres = get_all_data(name=current_user.current_asset)
+    pprint(tyres)
     con_tyres = None
     if tyres != None:
         if '@connected_to_id' in tyres:
@@ -176,6 +176,5 @@ def account():
 @app.route('/assetlocation')
 @logged_in
 def assetlocation():
-    lat = '51.189125'
-    lon = '6.840169'
+    lat, lon = getLocation(current_user.current_asset.id)
     return render_template('assetlocation.html', user=current_user, lat=lat, lon=lon)

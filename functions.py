@@ -6,6 +6,9 @@ from PIL import Image
 from flask_login import current_user
 from functools import wraps
 from flask import render_template, redirect, url_for, request, session
+from tables import Asset
+import API.Balert as balert
+import xmltodict
 
 
 def uploading_files(data):
@@ -49,3 +52,12 @@ def logged_in(f):
         else:
             return redirect(url_for('login', next=request.url))
     return decorated_func
+
+
+def getLocation(assetId):
+    asset = Asset.query.filter_by(id=assetId).first()
+    data = balert.Get_tires_by_Name(asset.name)
+    if data[0]:
+        return data[1]['@lat'],data[1]['@lng']
+    else:
+        return 0, 0
