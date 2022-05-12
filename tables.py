@@ -146,8 +146,8 @@ class Asset_status(db.Model):
 class Asset(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     wacs_id = db.Column(db.Integer(), unique=True)
-    name = db.Column(db.String(50), unique=True)
-    vin = db.Column(db.String(50), unique=True)
+    name = db.Column(db.String(50))
+    vin = db.Column(db.String(50))
     licenseplate = db.Column(db.String(50))
     milles = db.Column(db.Integer())
     brand = db.Column(db.Integer, db.ForeignKey('asset_brands.id'))
@@ -157,6 +157,10 @@ class Asset(db.Model):
     aggregaten = db.relationship('Aggregaat', secondary='asset_aggregaat', backref='assets')
     types = db.relationship('Asset_type', secondary='type_asset_type', backref='types')
     repair_requests = db.relationship('Repair_request', backref='asset')
+    FirstRegistration = db.Column(db.DateTime())
+    EuroNorm = db.Column(db.String(10))
+    # kind = db.relationship('Repair_request', backref='asset')
+    kindWacs = db.Column(db.String(50))
 
     def __repr__(self):
         return '{}'.format(self.name)
@@ -272,8 +276,8 @@ user_manager = UserManager(app, db, User)
 """ 
 to update db
 open terminal
-    1   flask db head
-    2   flask db migrate -m 'name versie'
+    1   flask db stamp head
+    2   flask db migrate
     3   flask db upgrade
 """
 

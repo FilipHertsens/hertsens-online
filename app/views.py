@@ -178,3 +178,10 @@ def account():
 def assetlocation():
     lat, lon = getLocation(current_user.current_asset.id)
     return render_template('assetlocation.html', user=current_user, lat=lat, lon=lon)
+
+@app.route('/assetlist')
+@logged_in
+def assetlist():
+    data = Asset.query.all()
+    print(type(data))
+    return render_template('assetlist.html', user=current_user, data=data)
