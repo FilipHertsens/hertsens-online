@@ -167,6 +167,9 @@ class Asset(db.Model):
     def __repr__(self):
         return '{}'.format(self.name)
 
+    def keys(self):
+        return ['id','wacs_id']
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'

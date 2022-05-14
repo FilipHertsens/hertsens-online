@@ -183,4 +183,5 @@ def assetlocation():
 @logged_in
 def assetlist():
     data = Asset.query.all()
+    print(data[0].keys())
     return render_template('assetlist.html', user=current_user, data=data)
