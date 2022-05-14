@@ -68,11 +68,11 @@
             </div>
 
             <div class="dropdown">
-                <button type="button" class="btn btn-outline-light my-2 my-sm-0 dropdown-toggle dropdown-toggle-split"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-radius: 0rem 0.25rem 0.25rem 0rem;">
-                    <span class="sr-only">Toggle Dropright</span>
-                </button>
-                <div class="dropdown-menu" style="right:auto; left:-220px">
+                    <button type="button" class="btn btn-outline-light my-2 my-sm-0 dropdown-toggle dropdown-toggle-split"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-radius: 0rem 0.25rem 0.25rem 0rem;">
+                        <span class="sr-only">Toggle Dropright</span>
+                    </button>
+                <div class="dropdown-menu" style="right:auto; left:-200px">
                     <h6 class="dropdown-header">Favorieten</h6>
                     {% for favoriet in user.favoriteassets %}
                     {% set ref = "/select_asset?autocomplete=" + favoriet.id|string + "&next=" + request.url %}
