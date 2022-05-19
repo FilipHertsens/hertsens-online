@@ -160,15 +160,36 @@ class Asset(db.Model):
     types = db.relationship('Asset_type', secondary='type_asset_type', backref='types')
     repair_requests = db.relationship('Repair_request', backref='asset')
     FirstRegistration = db.Column(db.DateTime())
+    # FirstRegistration_1 = FirstRegistration
     EuroNorm = db.Column(db.String(10))
     # kind = db.relationship('Repair_request', backref='asset')
     kindWacs = db.Column(db.String(50))
 
+
     def __repr__(self):
         return '{}'.format(self.name)
 
-    def keys(self):
-        return ['id','wacs_id']
+    def setDates(self):
+        if self.FirstRegistration != None:
+            self.FirstRegistration_1 = self.FirstRegistration.strftime('%d/%m/%Y')
+        else:
+            self.FirstRegistration_1 = ''
+        return ''
+
+
+    def tableKeys(self):
+        keydict = {}
+        keydict['id'] = 'id'
+        keydict['wacs_id'] = 'wacs_id'
+        keydict['name'] = 'name'
+        keydict['licenseplate'] = 'licenseplate'
+        keydict['vin'] = 'vin'
+        keydict['brand'] = 'asset_brands'
+        keydict['model'] = 'asset_model'
+        keydict['status'] = 'asset_status'
+        keydict['FirstRegistration'] = 'FirstRegistration_1'
+        keydict['kindWacs'] = 'kindWacs'
+        return keydict
 
 
 class User(UserMixin, db.Model):
@@ -183,6 +204,7 @@ class User(UserMixin, db.Model):
     current_asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'))
     favoriteassets = db.relationship('Asset', secondary='user_assets', backref='users')
     repair_requests = db.relationship('Repair_request', backref='user')
+    DatatableFilters = db.relationship('Datatable_filters', backref='user')
 
     def __repr__(self):
         return '{}{}'.format(self.first_name, self.last_name)
@@ -271,6 +293,18 @@ class Repair_request(db.Model):
     asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'))
 
 
+class Datatable_filters(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    path = db.Column(db.String(50))
+    bnName = db.Column(db.String(50))
+    bnValue = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __repr__(self):
+        return '{}'.format(self.bnName)
+
+
+
 """
 b9TYXFqDBuc9JdCB4oCutbZzx5h1mOAL9XZsTsFp
 class 
@@ -315,6 +349,7 @@ admin.add_view(MyModelView(User, db.session, category="Users"))
 admin.add_view(MyModelView(Role, db.session, category="Users"))
 admin.add_view(MyModelView(Navbarcat, db.session, category="Users"))
 admin.add_view(MyModelView(Navbarbutton, db.session, category="Users"))
+admin.add_view(MyModelView(Datatable_filters, db.session, category="Users"))
 
 admin.add_sub_category(name="assets", parent_name="Assets")
 admin.add_view(MyModelView(Asset, db.session, category="Assets"))

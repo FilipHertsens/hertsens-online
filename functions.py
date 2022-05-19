@@ -6,7 +6,7 @@ from PIL import Image
 from flask_login import current_user
 from functools import wraps
 from flask import render_template, redirect, url_for, request, session
-from tables import Asset
+from tables import Asset, Datatable_filters
 import API.Balert as balert
 import xmltodict
 
@@ -61,3 +61,27 @@ def getLocation(assetId):
         return data[1]['@lat'],data[1]['@lng']
     else:
         return 0, 0
+
+def getDatatableFilterBN(path,user):
+    filters = Datatable_filters.query.filter_by(path=path, user_id=user.id)
+    bn = ''
+    # curr_dt = datetime.datetime.now()
+    # timestamp = int(round(curr_dt.timestamp()))
+    # print(timestamp*1000+2000)
+    for filter in filters:
+        new_bn = ''',
+                     {text: '%s', action: function ( e, dt, node, config ) { var js = %s
+                            loadsavestates(js);}}''' % (filter.bnName, filter.bnValue)
+        bn += new_bn
+    buttons = '''[%s,{text: 'Clear filters', action: function ( e, dt, node, config ) { table.state.clear();
+                        window.location.reload();;}},
+                         {text: 'Save filters', action: function ( e, dt, node, config ) {
+                         let text;
+                         let person = prompt("Please enter a name for this filter settings:", "");
+                         if (person == null || person == "") {
+
+                        } else {
+                            savesavestates(name=person);
+                        }
+                        ;;}}]''' % bn
+    return buttons

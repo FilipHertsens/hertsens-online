@@ -2,17 +2,18 @@ from flask import render_template, redirect, url_for, request, flash, current_ap
 from flask_login import login_user, logout_user, current_user
 from flask_user import roles_required
 from forms import LoginForm, RegisterForm, Asset_selector, repair_request
-from tables import User, Asset, Repair_request, Status_request
+from tables import User, Asset, Repair_request, Status_request, Datatable_filters
 import datetime
 from app import app, db, mail
 from werkzeug.security import generate_password_hash, check_password_hash
-from functions import uploading_files, logged_in, getLocation
+from functions import uploading_files, logged_in, getLocation, getDatatableFilterBN
 from flask_mail import Message
 from sending_mail import send_mail, send_repair_request
 from API.Balert import get_all_data, fig_band
 import io
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from pprint import pprint
+import json
 
 
 @app.route('/')
@@ -183,5 +184,19 @@ def assetlocation():
 @logged_in
 def assetlist():
     data = Asset.query.all()
-    print(data[0].keys())
-    return render_template('assetlist.html', user=current_user, data=data)
+    filter_buttons = getDatatableFilterBN(path='/assetlist', user=current_user)
+    return render_template('assetlist.html', user=current_user, data=data, but=filter_buttons, tableKeys=data[0].tableKeys())
+
+@app.route('/savesavestates', methods=['POST'])
+def savesavestates():
+    if request.method == "POST":
+        name = request.json['name']
+        Datatable_filters(
+            path=request.json['path'],
+            bnName= name,
+
+            bnValue=request.json['data'],
+            user=current_user
+        )
+        db.session.commit()
+        return json.dumps({'succes':f'Filter state saved as {name}'})
