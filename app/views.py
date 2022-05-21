@@ -140,7 +140,7 @@ def repairRequest():
             description=form.description.data,
             demage_case=form.damage_case.data,
             depannage_required=form.depannage_required.data,
-            files=uploads[1],
+            files=json.dumps(uploads[1]),
             user=current_user,
             status=Status_request.query.filter_by(id=1).first(),
             request_time = datetime.datetime.now()
@@ -149,7 +149,7 @@ def repairRequest():
         flash('Thanks for the repair request. We will get back to you as soon as possible', "alert alert-success")
         # send email
         to = ["garage@hertsens.eu"]
-        send_repair_request(request=r)
+        # send_repair_request(request=r)
         return redirect(url_for('index'))
     error = None
     return render_template('repairrequest.html', error=error, user=current_user, form=form, form2=form2)
@@ -161,7 +161,6 @@ def tirepressure():
     if current_user.current_asset_id == None:
         return redirect(url_for('select_asset', next=request.url))
     tyres = get_all_data(name=current_user.current_asset)
-    pprint(tyres)
     con_tyres = None
     if tyres != None:
         if '@connected_to_id' in tyres:
@@ -194,7 +193,6 @@ def savesavestates():
         Datatable_filters(
             path=request.json['path'],
             bnName= name,
-
             bnValue=request.json['data'],
             user=current_user
         )
