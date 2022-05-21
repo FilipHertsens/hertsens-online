@@ -41,9 +41,9 @@
                 {% elif value['type'] == 'files' %}
                     {% if row[value['text']] == '' %}
                     {% else %}
-                        {% set list1 = row[value['text']].split(';\n') %}
+                        {% set list1 = row[value['text']] %}
                         <button onclick="tableModalFilles({{list1}})" class="{{value['class']}}">
-                            {{list1|length}}
+                            {{list1.split('}, {')|length}}
                         </button>
                     {% endif %}
 
@@ -68,7 +68,7 @@
       </div>
       <div class="modal-body">
         <div id="carouselExampleControls" class="carousel slide" data-interval="false">
-          <div class="carousel-inner">
+          <div class="carousel-inner" id="slitsmodal">
 
           </div>
             <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
@@ -224,24 +224,68 @@ for (let i = 0; i < elements[0].childNodes.length; i++) {
 }
 
 function tableModalFilles (data) {
-    for (let i = 0; i < data.length; i++) {
-        type = mimeType('/static/uploads/'+data[i]);
-        console.log(type);
-    }
+    const box = document.getElementById('slitsmodal')
+    box.innerHTML = ''
+    var list =  Object.entries(data)
+    var html = ''
+    for (const [key, value] of list) {
+        const item = document.createElement("div");
+        console.log(key, value);
+        if (key == 0){
+            active = 'active';
+        } else {
+            active = ''
+        }
+        item.className = `carousel-item ${active}`;
+        var type = value['type'].split('/')[0];
+        var filename = value['name'];
+        if (type == 'image'){
+            const img = document.createElement("img");
+            img.className = "d-block w-100";
+            img.src = `/static/uploads/${filename}`
+            item.appendChild(img);
+        } else if (type == 'video'){
+            const img = document.createElement("video");
+            img.style.width = '80%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
+            img.style.margin = 'auto';
+            img.controls = true
+            img.autoplay = true
+            img.muted = true
+            const source = document.createElement("source");
+            source.src = `/static/uploads/${filename}`
+            source.type = 'video/mp4'
+            img.appendChild(source);
+            item.appendChild(img);
+        } else if (type == 'audio'){
+            const img = document.createElement("audio");
+            img.style.display = 'block';
+            img.style.margin = 'auto';
+            img.controls = true
+            const source = document.createElement("source");
+            source.src = `/static/uploads/${filename}`
+            source.type = 'audio/mpeg'
+            img.appendChild(source);
+            item.appendChild(img);
+        } else {
+            console.log('its a someting else');
+            const img = document.createElement("a");
+            img.className = "d-block w-100";
+            img.href = `/static/uploads/${filename}`
+            img.style.textAlign = 'center';
+            img.target = '_blank';
+            img.innerHTML = filename;
+            item.appendChild(img);
+        }
+    const box = document.getElementById('slitsmodal');
+    box.appendChild(item);
 
+    }
     $("#tablefilemodal").modal()
 }
 
-function mimeType(fileUrl){
-    var xhr = new XMLHttpRequest();
-        xhr.open('HEAD', 'fileUrl', true);
-        xhr.onload = function() {
-            var contentType = xhr.getResponseHeader('Content-Type');
-            console.log(contentType);
-            return contentType
-        };
-    xhr.send();
-    }
+
 
 </script>
 {% endblock %}

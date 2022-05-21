@@ -294,9 +294,7 @@ class Repair_request(db.Model):
 
     def tableKeys(self):
         keydict = {}
-        test = '''<div class="carousel-item active">
-              <img class="d-block w-100" src="/static/uploads/282__1__06052022_172751.jpg" alt="First slide" width="80%">
-            </div>'''
+
         keydict['id'] = {'text':'id','type':'text'}
         keydict['description'] = {'text':'description','type':'text'}
         keydict['DC'] = {'text':'demage_case','type':'text'}
@@ -307,7 +305,6 @@ class Repair_request(db.Model):
         keydict['user'] = {'text':'user','type':'link','href':'/user'}
         keydict['request_time'] = {'text':'request_time','type':'time'}
         return keydict
-
 
 class Datatable_filters(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
