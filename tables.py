@@ -292,6 +292,22 @@ class Repair_request(db.Model):
     request_time = db.Column(db.DateTime())
     asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'))
 
+    def tableKeys(self):
+        keydict = {}
+        test = '''<div class="carousel-item active">
+              <img class="d-block w-100" src="/static/uploads/282__1__06052022_172751.jpg" alt="First slide" width="80%">
+            </div>'''
+        keydict['id'] = {'text':'id','type':'text'}
+        keydict['description'] = {'text':'description','type':'text'}
+        keydict['DC'] = {'text':'demage_case','type':'text'}
+        keydict['DP'] = {'text':'depannage_required','type':'text'}
+        keydict['status'] = {'text':'status','type':'text'}
+        keydict['files'] = {'text':'files','type':'files','html':''}
+        keydict['asset'] = {'text':'asset','type':'link','href':'/asset'}
+        keydict['user'] = {'text':'user','type':'link','href':'/user'}
+        keydict['request_time'] = {'text':'request_time','type':'time'}
+        return keydict
+
 
 class Datatable_filters(db.Model):
     id = db.Column(db.Integer(), primary_key=True)

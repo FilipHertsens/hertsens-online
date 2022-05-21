@@ -65,9 +65,6 @@ def getLocation(assetId):
 def getDatatableFilterBN(path,user):
     filters = Datatable_filters.query.filter_by(path=path, user_id=user.id)
     bn = ''
-    # curr_dt = datetime.datetime.now()
-    # timestamp = int(round(curr_dt.timestamp()))
-    # print(timestamp*1000+2000)
     for filter in filters:
         new_bn = ''',
                      {text: '%s', action: function ( e, dt, node, config ) { var js = %s
