@@ -13,7 +13,7 @@ import xmltodict
 
 def uploading_files(data):
     files_filenames = []
-    x = 0
+    x=1
     try:
         for file in data:
             if file.filename != '':
@@ -34,8 +34,7 @@ def uploading_files(data):
                 else:
                     file_filename = f"{file_filename}.{ex}"
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_filename))
-                files_filenames.append({'name':file_filename, 'type':mimetype})
-
+                files_filenames.append({'name':file_filename,'type':mimetype})
                 x+=1
         return True, files_filenames
     except:
@@ -63,9 +62,6 @@ def getLocation(assetId):
 def getDatatableFilterBN(path,user):
     filters = Datatable_filters.query.filter_by(path=path, user_id=user.id)
     bn = ''
-    # curr_dt = datetime.datetime.now()
-    # timestamp = int(round(curr_dt.timestamp()))
-    # print(timestamp*1000+2000)
     for filter in filters:
         new_bn = ''',
                      {text: '%s', action: function ( e, dt, node, config ) { var js = %s

@@ -130,6 +130,7 @@ def repairRequest():
     form2 = Asset_selector()
     if form.validate_on_submit():
         uploads = uploading_files(data=form.files.data)
+
         asset_str = form2.autocomplete.data
         asset = Asset.query.filter_by(name=asset_str).first()
         if asset == None:
@@ -185,6 +186,13 @@ def assetlist():
     data = Asset.query.all()
     filter_buttons = getDatatableFilterBN(path='/assetlist', user=current_user)
     return render_template('assetlist.html', user=current_user, data=data, but=filter_buttons, tableKeys=data[0].tableKeys())
+
+@app.route('/repairRequestList')
+@logged_in
+def repairRequestList():
+    data = Repair_request.query.all()
+    filter_buttons = getDatatableFilterBN(path='/repairRequestList', user=current_user)
+    return render_template('repairrequestslist.html', user=current_user, data=data, but=filter_buttons, tableKeys=data[0].tableKeys())
 
 @app.route('/savesavestates', methods=['POST'])
 def savesavestates():
