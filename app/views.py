@@ -130,6 +130,7 @@ def repairRequest():
     form2 = Asset_selector()
     if form.validate_on_submit():
         uploads = uploading_files(data=form.files.data)
+
         asset_str = form2.autocomplete.data
         asset = Asset.query.filter_by(name=asset_str).first()
         if asset == None:
@@ -140,7 +141,7 @@ def repairRequest():
             description=form.description.data,
             demage_case=form.damage_case.data,
             depannage_required=form.depannage_required.data,
-            files=uploads[1],
+            files=json.dumps(uploads[1]),
             user=current_user,
             status=Status_request.query.filter_by(id=1).first(),
             request_time = datetime.datetime.now()
@@ -149,7 +150,7 @@ def repairRequest():
         flash('Thanks for the repair request. We will get back to you as soon as possible', "alert alert-success")
         # send email
         to = ["garage@hertsens.eu"]
-        send_repair_request(request=r)
+        # send_repair_request(request=r)
         return redirect(url_for('index'))
     error = None
     return render_template('repairrequest.html', error=error, user=current_user, form=form, form2=form2)

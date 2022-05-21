@@ -12,12 +12,10 @@ import xmltodict
 
 
 def uploading_files(data):
-    files_filenames = ''
+    files_filenames = []
     x=1
     try:
         for file in data:
-            if files_filenames != '':
-                files_filenames += ';\n'
             if file.filename != '':
                 ex = file.filename.split('.')[-1]
                 filename = str(datetime.datetime.now().strftime("%d%m%Y_%H%M%S"))
@@ -36,8 +34,7 @@ def uploading_files(data):
                 else:
                     file_filename = f"{file_filename}.{ex}"
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_filename))
-                files_filenames += file_filename
-
+                files_filenames.append({'name':file_filename,'type':mimetype})
                 x+=1
         return True, files_filenames
     except:
