@@ -244,8 +244,13 @@ function tableModalFilles (data) {
             source.type = 'audio/mpeg'
             img.appendChild(source);
             item.appendChild(img);
+        } else if (value['type'] == 'application/pdf'){
+            const img = document.createElement("embed");
+            img.src = `/static/uploads/${filename}`;
+            img.style.width = '100%';
+            img.style.height = '740px';
+            item.appendChild(img);
         } else {
-            console.log('its a someting else');
             const img = document.createElement("a");
             img.className = "d-block w-100";
             img.href = `/static/uploads/${filename}`
