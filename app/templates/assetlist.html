@@ -23,23 +23,62 @@
         </thead>
         <tbody>
         {% for row in data %}
-        {{ row.setDates() }}
         <tr>
             {% for value in tableKeys.values() %}
-            <td>{{row[value]}}</td>
-            {% endfor %}
+            <td>
+                {% set href1 = value['href']%}
+                {% set href2 = row[value['text']].id %}
+                {% set href = [href1,href2]|join('/') %}
 
-            <!--                {% if not row.FirstRegistration == None %}-->
-            <!--                    <td>{{row.FirstRegistration.strftime('%d/%m/%Y')}}</td>-->
-            <!--                {% else %}-->
-            <!--                    <td></td>-->
-            <!--                {% endif %}-->
+                {% if value['type'] == 'text' %}
+                    {{row[value['text']]}}
+                {% elif value['type'] == 'link' %}
+                        <a href="{{href}}" class="{{value['class']}}" target="_blank">
+                            {{row[value['text']]}}
+                        </a>
+                {% elif value['type'] == 'time' %}
+                    {{row[value['text']].strftime('%H:%M %d/%m/%Y')}}
+                {% elif value['type'] == 'files' %}
+                    {% if row[value['text']] == '' %}
+                    {% else %}
+                        {% set list1 = row[value['text']] %}
+                        <button onclick="tableModalFilles({{list1}})" class="{{value['class']}}">
+                            {{list1.split('}, {')|length}}
+                        </button>
+                    {% endif %}
+
+                {% endif %}
+            </td>
+            {% endfor %}
         </tr>
         {% endfor %}
         </tbody>
     </table>
 
 </div> <!-- /container -->
+
+<div class="modal" tabindex="-1" role="dialog" id="tablefilemodal">
+  <div class="modal-dialog" role="document" >
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Files</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="carouselExampleControls" class="carousel slide" data-interval="false">
+            <a class="previous round" href="#carouselExampleControls" role="button" data-slide="prev">&#8249;</a>
+            <a class="previous round" href="#carouselExampleControls" role="button" data-slide="next" style="margin:10px">&#8250;</a>
+            <br>
+          <div class="carousel-inner" id="slitsmodal">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -49,105 +88,88 @@
 <script type="text/javascript" src="http://cdn.datatables.net/plug-ins/1.12.0/sorting/datetime-moment.js"></script>
 <script>
 
+// Setup - add a text input to each footer cell
+$.fn.dataTable.moment('HH:mm D/M/YYYY')
+$.fn.dataTable.moment('D/M/YYYY')
+$('#datatable thead tr')
+    .clone(true)
+    .addClass('filters')
+    .appendTo('#datatable thead');
 
 
-
-
-    // Setup - add a text input to each footer cell
-    $.fn.dataTable.moment('D/M/YYYY')
-    $('#datatable thead tr')
-        .clone(true)
-        .addClass('filters')
-        .appendTo('#datatable thead');
-
-
-    var table = $('#datatable').DataTable({
-
-        buttons: [
-            {
-                extend: 'collection',
-                text: 'Export',
-                buttons: ['copy','csv','excel','pdf']
-            },{
-                extend: 'colvis',
-                text: 'Columns'
-            },
-            'print',
-
-             {
-                extend: 'collection',
-                text: 'Filtering',
-                buttons: {{but|safe}}
-            }
-
-
-
-            ],
-
-        scrollCollapse: false,
-        paging: false,
-        colReorder: true,
-        stateSave: true,
-        stateDuration: 0,
-        orderCellsTop: true,
-        scrollY: "650px",
-        sScrollX: "100%",
-        scrollCollapse: true,
-        initComplete: function () {
-            var api = this.api();
-
-            // For each column
-            api
-                .columns()
-                .eq(0)
-                .each(function (colIdx) {
-                    // Set the header cell to contain the input element
-                    var cell = $('.filters th').eq(
-                        $(api.column(colIdx).header()).index()
-                    );
-                    var title = $(cell).text();
-                    $(cell).html('<input type="text" placeholder="' + title + '" />');
-
-                    // On every keypress in this input
-                    $(
-                        'input',
-                        $('.filters th').eq($(api.column(colIdx).header()).index())
-                    )
-                        .off('keyup change')
-                        .on('keyup change', function (e) {
-                            e.stopPropagation();
-
-                            // Get the search value
-                            $(this).attr('title', $(this).val());
-                            var regexr = '({search})'; //$(this).parents('th').find('select').val();
-
-                            var cursorPosition = this.selectionStart;
-                            // Search the column for that value
-                            api
-                                .column(colIdx)
-                                .search(
-                                    this.value != ''
-                                        ? regexr.replace('{search}', '(((' + this.value + ')))')
-                                        : '',
-                                    this.value != '',
-                                    this.value == ''
-                                )
-                                .draw();
-
-                            $(this)
-                                .focus()[0]
-                                .setSelectionRange(cursorPosition, cursorPosition);
-                        });
-                });
+var table = $('#datatable').DataTable({
+    buttons: [
+        {
+            extend: 'collection',
+            text: 'Export',
+            buttons: ['copy','csv','excel','pdf','print']
+        },{
+            extend: 'colvis',
+            text: 'Columns'
         },
-    });
-    table.buttons().container().appendTo( $('.col-sm-12:eq(0)', table.table().container() ) );
+         {
+            extend: 'collection',
+            text: 'Filtering',
+            buttons: {{but|safe}}
+        }],
 
-<!--$('#datatable thead th').each( function (index,value) {-->
-<!--                var title = $(this).text();-->
-<!--                $(this).html( '<input class="filters" type="text" placeholder="Search '+title+'" value="'+table.column(index).search()+'"/>' );-->
-<!--            } );-->
+    scrollCollapse: false,
+    paging: false,
+    colReorder: true,
+    stateSave: true,
+    stateDuration: 0,
+    orderCellsTop: true,
+    scrollY: "650px",
+    sScrollX: "100%",
+    scrollCollapse: true,
+    initComplete: function () {
+        var api = this.api();
+        // For each column
+        api
+            .columns()
+            .eq(0)
+            .each(function (colIdx) {
+                // Set the header cell to contain the input element
+                var cell = $('.filters th').eq(
+                    $(api.column(colIdx).header()).index()
+                );
+                var title = $(cell).text();
+                $(cell).html('<input type="text" placeholder="' + title + '" />');
 
+                // On every keypress in this input
+                $(
+                    'input',
+                    $('.filters th').eq($(api.column(colIdx).header()).index())
+                )
+                    .off('keyup change')
+                    .on('keyup change', function (e) {
+                        e.stopPropagation();
+
+                        // Get the search value
+                        $(this).attr('title', $(this).val());
+                        var regexr = '({search})'; //$(this).parents('th').find('select').val();
+
+                        var cursorPosition = this.selectionStart;
+                        // Search the column for that value
+                        api
+                            .column(colIdx)
+                            .search(
+                                this.value != ''
+                                    ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                    : '',
+                                this.value != '',
+                                this.value == ''
+                            )
+                            .draw();
+
+                        $(this)
+                            .focus()[0]
+                            .setSelectionRange(cursorPosition, cursorPosition);
+                    });
+            });
+    },
+});
+table.buttons().container().appendTo( $('.col-sm-12:eq(0)', table.table().container() ) );
 
 function loadsavestates(data) {
     window.localStorage.setItem('DataTables_datatable_'+window.location.pathname , JSON.stringify(data));
@@ -172,14 +194,72 @@ function savesavestates(name) {
 var elements = document.getElementsByClassName('filters');
 for (let i = 0; i < elements[0].childNodes.length; i++) {
   var val = table.column(i).search()
-  console.log(table.column(i).header())
-  console.log(table.column(i).search())
-  console.log(table.row(i))
   if (val != ''){
   elements[0].childNodes[i].childNodes[0].value = val.split('((((')[1].split(')')[0];
   }
 }
 
+function tableModalFilles (data) {
+    const box = document.getElementById('slitsmodal')
+    box.innerHTML = ''
+    var list =  Object.entries(data)
+    var html = ''
+    for (const [key, value] of list) {
+        const item = document.createElement("div");
+        console.log(key, value);
+        if (key == 0){
+            active = 'active';
+        } else {
+            active = ''
+        }
+        item.className = `carousel-item ${active}`;
+        var type = value['type'].split('/')[0];
+        var filename = value['name'];
+        if (type == 'image'){
+            const img = document.createElement("img");
+            img.className = "d-block w-100";
+            img.src = `/static/uploads/${filename}`
+            item.appendChild(img);
+        } else if (type == 'video'){
+            const img = document.createElement("video");
+            img.style.width = '80%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
+            img.style.margin = 'auto';
+            img.controls = true
+            img.autoplay = true
+            img.muted = true
+            const source = document.createElement("source");
+            source.src = `/static/uploads/${filename}`
+            source.type = 'video/mp4'
+            img.appendChild(source);
+            item.appendChild(img);
+        } else if (type == 'audio'){
+            const img = document.createElement("audio");
+            img.style.display = 'block';
+            img.style.margin = 'auto';
+            img.controls = true
+            const source = document.createElement("source");
+            source.src = `/static/uploads/${filename}`
+            source.type = 'audio/mpeg'
+            img.appendChild(source);
+            item.appendChild(img);
+        } else {
+            console.log('its a someting else');
+            const img = document.createElement("a");
+            img.className = "d-block w-100";
+            img.href = `/static/uploads/${filename}`
+            img.style.textAlign = 'center';
+            img.target = '_blank';
+            img.innerHTML = filename;
+            item.appendChild(img);
+        }
+    const box = document.getElementById('slitsmodal');
+    box.appendChild(item);
+
+    }
+    $("#tablefilemodal").modal()
+}
 
 </script>
 {% endblock %}

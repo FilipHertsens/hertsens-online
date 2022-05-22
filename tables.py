@@ -169,26 +169,18 @@ class Asset(db.Model):
     def __repr__(self):
         return '{}'.format(self.name)
 
-    def setDates(self):
-        if self.FirstRegistration != None:
-            self.FirstRegistration_1 = self.FirstRegistration.strftime('%d/%m/%Y')
-        else:
-            self.FirstRegistration_1 = ''
-        return ''
-
-
     def tableKeys(self):
         keydict = {}
-        keydict['id'] = 'id'
-        keydict['wacs_id'] = 'wacs_id'
-        keydict['name'] = 'name'
-        keydict['licenseplate'] = 'licenseplate'
-        keydict['vin'] = 'vin'
-        keydict['brand'] = 'asset_brands'
-        keydict['model'] = 'asset_model'
-        keydict['status'] = 'asset_status'
-        keydict['FirstRegistration'] = 'FirstRegistration_1'
-        keydict['kindWacs'] = 'kindWacs'
+        keydict['id'] = {'text': 'id', 'type': 'text'}
+        keydict['wacs_id'] = {'text': 'wacs_id', 'type': 'text'}
+        keydict['name'] = {'text': 'name', 'type': 'text'}
+        keydict['licenseplate'] = {'text': 'licenseplate', 'type': 'text'}
+        keydict['vin'] = {'text': 'vin', 'type': 'text'}
+        keydict['brand'] = {'text': 'asset_brands', 'type': 'text'}
+        keydict['model'] = {'text': 'asset_model', 'type': 'text'}
+        keydict['status'] = {'text': 'asset_status', 'type': 'text'}
+        keydict['FirstRegistration'] = {'text': 'FirstRegistration', 'type': 'text'}
+        keydict['kindWacs'] = {'text': 'kindWacs', 'type': 'text'}
         return keydict
 
 
